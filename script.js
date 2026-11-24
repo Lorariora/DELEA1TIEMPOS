@@ -1,0 +1,1289 @@
+
+const G=[
+["-ar 規則動詞","",[["hablar","說"],["trabajar","工作"],["estudiar","學習"],["comprar","買"],["necesitar","需要"],["escuchar","聽"],["tomar","吃、喝；搭乘"],["desayunar","吃早餐"],["cenar","吃晚餐"],["bailar","跳舞"],["cantar","唱歌"],["viajar","旅行"],["caminar","走路"],["mirar","看"],["preguntar","問"],["contestar","回答"],["esperar","等；希望"],["ayudar","幫助"],["entrar","進入"],["llegar","到達"],["terminar","結束"],["usar","使用"],["visitar","拜訪"],["cocinar","煮"],["pagar","付錢"],["buscar","找"],["practicar","練習"],["llamar","打電話；叫"],["nadar","游泳"],["lavar","洗"],["alquilar","租"],["olvidar","忘記"],["preparar","準備"],["invitar","邀請"],["enseñar","教；展示"],["tocar","彈奏；觸摸"],["ganar","贏；賺"],["pasar","度過；經過"],["celebrar","慶祝"],["limpiar","打掃"],["llevar","帶；穿"],["quedar","約（見面）"],["cambiar","換；改變"],["pasear","散步"],["reservar","預訂"],["regalar","送禮"],["bajar","下（車）"],["girar","轉彎"],["cruzar","穿越"]]],
+["-er 規則動詞","","comer 吃|beber 喝|leer 讀|vender 賣|aprender 學會|correr 跑|comprender 理解|responder 回答|creer 相信；認為|deber 應該".split("|").map(s=>s.split(" "))],
+["-ir 規則動詞","","vivir 住；生活|escribir 寫|abrir 打開|recibir 收到|decidir 決定|subir 上去|compartir 分享|asistir 出席|describir 描述|partir 出發|cumplir 滿…歲".split("|").map(s=>s.split(" "))],
+["詞幹變化動詞","重音音節的母音會變，nosotros / vosotros 不變。",[["querer","想要；愛","e→ie"],["empezar","開始","e→ie"],["pensar","想；認為","e→ie"],["preferir","偏好","e→ie"],["entender","懂","e→ie"],["cerrar","關","e→ie"],["perder","失去；輸","e→ie"],["sentir","感覺","e→ie"],["poder","能夠","o→ue"],["volver","回來","o→ue"],["dormir","睡覺","o→ue"],["encontrar","找到","o→ue"],["costar","價錢是","o→ue"],["recordar","記得","o→ue"],["almorzar","吃午餐","o→ue"],["llover","下雨","o→ue"],["jugar","玩；比賽","u→ue"],["pedir","點；要求","e→i"],["seguir","繼續；跟隨","e→i"],["repetir","重複","e→i"],["servir","服務；有用","e→i"],["contar","數；講述","o→ue"],["comenzar","開始","e→ie"]],1],
+["yo 形不規則","只有 yo 這一格特別，其餘多半規則。",[["hacer","做","hago"],["poner","放","pongo"],["salir","出去；離開","salgo"],["traer","帶來","traigo"],["conocer","認識","conozco"],["saber","知道；會","sé"],["ver","看見","veo"],["dar","給","doy"],["venir","來","vengo"],["tener","有","tengo"],["decir","說","digo"],["oír","聽見","oigo"],["parecer","似乎","parezco"],["ofrecer","提供","ofrezco"],["coger","拿；搭乘","cojo"]]],
+];
+const R=[["llamarse","名叫"],["levantarse","起床"],["ducharse","淋浴"],["acostarse","上床睡覺"],["despertarse","醒來"],["vestirse","穿衣服"],["sentarse","坐下"],["ponerse","穿上"],["lavarse","洗（自己）"],["bañarse","洗澡"],["peinarse","梳頭"],["afeitarse","刮鬍子"],["quedarse","留下；待著"],["sentirse","感覺"]];
+const I=[["ser","soy eres es somos sois son"],["estar","estoy estás está estamos estáis están"],["ir","voy vas va vamos vais van"],["tener","tengo tienes tiene tenemos tenéis tienen"],["hacer","hago haces hace hacemos hacéis hacen"],["querer","quiero quieres quiere queremos queréis quieren"],["poder","puedo puedes puede podemos podéis pueden"],["venir","vengo vienes viene venimos venís vienen"],["saber","sé sabes sabe sabemos sabéis saben"],["dar","doy das da damos dais dan"]];
+G[0][2].push(["acompañar","陪伴"]);G[1][2].push(["prometer","答應；承諾"]);G[2][2].push(["permitir","允許"]);G[3][2].push(["mostrar","展示；出示","o→ue"]);G[4][2].push(["caer","掉落；跌倒","caigo"]);R.push(["divertirse","玩得開心"]);
+const N=`acabar|結束；完成||Acabo el trabajo.|我完成工作。
+aceptar|接受||Acepto tu invitación.|我接受你的邀請。
+apagar|關（電器）||Apago la luz.|我關燈。
+arreglar|修理；整理||Arreglo mi bicicleta.|我修我的腳踏車。
+avisar|通知||Aviso a mi jefe.|我通知我的老闆。
+cargar|充電；搬運||Cargo el móvil.|我給手機充電。
+comentar|評論；談到||Comento la noticia con mi madre.|我和媽媽聊這則新聞。
+cuidar|照顧||Cuido a mi hermano.|我照顧我弟弟。
+dejar|讓；留下||Dejo las llaves en la mesa.|我把鑰匙留在桌上。
+descansar|休息||Descanso un poco.|我休息一下。
+disfrutar|享受||Disfruto la música.|我享受音樂。
+entregar|交給||Entrego la tarea al profesor.|我把作業交給老師。
+explicar|解釋||Explico la regla a mis alumnos.|我向學生解釋規則。
+gastar|花（錢）||Gasto mucho dinero.|我花很多錢。
+gritar|喊叫||Grito de alegría.|我開心地大叫。
+guardar|保存；收好||Guardo los documentos.|我把文件收好。
+lograr|成功做到||Logro aprobar el examen.|我成功通過考試。
+mandar|寄；傳||Mando un mensaje a Ana.|我傳訊息給 Ana。
+parar|停||Paro el coche aquí.|我把車停在這裡。
+perdonar|原諒||Perdono a mi amigo.|我原諒我的朋友。
+quitar|拿走||Quito los platos de la mesa.|我把盤子從桌上收走。
+saludar|打招呼||Saludo a mis vecinos.|我跟鄰居打招呼。
+sacar|拿出；取得||Saco el móvil del bolso.|我從包包拿出手機。
+tardar|花（時間）||Tardo una hora en llegar.|我花一個小時到達。
+tirar|丟||Tiro la basura.|我倒垃圾。
+tratar|試著||Trato de dormir más.|我試著多睡一點。
+utilizar|使用||Utilizo el diccionario.|我用字典。
+votar|投票||Voto en las elecciones.|我參加選舉投票。
+imaginar|想像||Imagino mi futuro.|我想像我的未來。
+ordenar|整理；命令||Ordeno mi habitación.|我整理我的房間。
+recomendar|推薦|e→ie|Recomiendo este restaurante.|我推薦這家餐廳。
+probar|試；嚐|o→ue|Pruebo la sopa.|我嚐湯。
+mover|移動|o→ue|Muevo la mesa.|我移動桌子。
+volar|飛|o→ue|Vuelo a Madrid.|我飛去馬德里。
+soñar|夢想；夢見|o→ue|Sueño con viajar.|我夢想旅行。
+encender|打開（電器）|e→ie|Enciendo la luz.|我開燈。
+mentir|說謊|e→ie|Miento muy poco.|我很少說謊。
+sugerir|建議|e→ie|Sugiero ir en tren.|我建議搭火車去。
+morir|死|o→ue|Muero de sueño.|我睏死了。
+resolver|解決|o→ue|Resuelvo el problema.|我解決這個問題。
+devolver|歸還|o→ue|Devuelvo el libro a la biblioteca.|我把書還給圖書館。
+atender|接待；照料|e→ie|Atiendo a los clientes.|我接待客人。
+defender|捍衛；保護|e→ie|Defiendo mi opinión.|我捍衛我的意見。
+conducir|開車|conduzco|Conduzco un coche pequeño.|我開一輛小車。
+traducir|翻譯|traduzco|Traduzco el texto al inglés.|我把文章翻成英文。
+reconocer|認出|reconozco|Reconozco tu voz.|我認得你的聲音。
+agradecer|感謝|agradezco|Agradezco tu ayuda.|我感謝你的幫忙。
+romper|弄壞；打破||Rompo un vaso.|我打破一個杯子。
+temer|害怕||Temo a las arañas.|我怕蜘蛛。
+meter|放進||Meto la ropa en la maleta.|我把衣服放進行李箱。
+esconder|藏||Escondo el regalo.|我把禮物藏起來。
+sufrir|受苦；忍受||Sufro de dolor de espalda.|我受背痛所苦。
+discutir|討論；爭吵||Discuto con mi hermano.|我和哥哥吵架。
+insistir|堅持||Insisto en pagar.|我堅持要付錢。
+dividir|分||Divido el pastel en ocho partes.|我把蛋糕分成八份。
+añadir|添加||Añado sal a la sopa.|我在湯裡加鹽。
+imprimir|列印||Imprimo el documento.|我列印文件。
+casarse|結婚||Me caso en junio.|我六月結婚。
+preocuparse|擔心||Me preocupo por mi madre.|我擔心我媽媽。
+quejarse|抱怨||Me quejo del ruido.|我抱怨噪音。
+aburrirse|覺得無聊||Me aburro en casa.|我在家很無聊。
+enfadarse|生氣||Me enfado con mi hermano.|我和哥哥生氣。
+ahorrar|存（錢）||Ahorro dinero para el viaje.|我為旅行存錢。
+aparcar|停車||Aparco el coche cerca de casa.|我把車停在家附近。
+dibujar|畫||Dibujo un gato en la pizarra.|我在黑板上畫一隻貓。
+mejorar|改善；變好||Mejoro mi pronunciación poco a poco.|我慢慢改善我的發音。
+organizar|籌辦；安排||Organizo una fiesta para mi amiga.|我為朋友籌辦一場派對。
+pintar|粉刷；畫||Pinto la pared de blanco.|我把牆漆成白色。
+llenar|裝滿||Lleno el depósito de gasolina.|我把油箱加滿。
+apuntar|記下||Apunto la dirección en el cuaderno.|我把地址記在筆記本上。
+barrer|掃（地）||Barro la cocina.|我把廚房掃乾淨。
+aplaudir|鼓掌||Aplaudo al cantante.|我為歌手鼓掌。
+fumar|抽菸||Fumo un cigarrillo.|我抽一根菸。
+acordarse|記得|o→ue|Me acuerdo de ti.|我記得你。
+recoger|撿起、收拾|recojo|Recojo mis cosas del suelo.|我把我的東西從地上撿起來。
+cortar|切、剪||Corto el pan con un cuchillo.|我用刀切麵包。
+mezclar|混合、攪拌||Mezclo la harina con el azúcar.|我把麵粉和糖混在一起。
+hervir|煮沸|e→ie|Hiervo agua para el té.|我燒開水泡茶。
+freír|油炸、煎|frío|Frío unos huevos para la cena.|我煎幾顆蛋當晚餐。
+planchar|熨燙||Plancho la camisa.|我熨襯衫。
+regar|澆水|e→ie|Riego las plantas del jardín.|我給院子裡的植物澆水。
+colgar|掛、晾|o→ue|Cuelgo la ropa en el balcón.|我把衣服晾在陽台上。`.split("\n").map(l=>l.split("|"));N.forEach(a=>{const[v,z,t]=a;if(v.endsWith("se"))R.push([v,z]);else if(t.includes("→"))G[3][2].push([v,z,t]);else if(t)G[4][2].push([v,z,t]);else G[{ar:0,er:1,ir:2}[v.slice(-2)]][2].push([v,z])});
+const v=(a)=>`<div class="v" data-k="${a[0]}" data-z="${a[1]}"><b>${a[0]}</b><span class="csp" data-s="${a[0]}">🔊</span><span>${a[1]}</span>${a[2]?`<i>${a[2]}</i>`:""}</div>`;
+let h="",nav="";
+G.forEach((g,i)=>{const id=i+2;const body=g[3]?[...new Set(g[2].map(a=>a[2]))].map(t=>`<h3>${t}</h3><div class="grid">${g[2].filter(a=>a[2]===t).map(a=>v([a[0],a[1]])).join("")}</div>`).join(""):`<div class="grid">${g[2].map(v).join("")}</div>`;
+h+=`<div class="card" id="s${id}"><h2><span class="n">${id}</span>${g[0]}</h2>${g[1]?`<p class="note">${g[1]}</p>`:""}${body}</div>`;});
+document.getElementById("groups").innerHTML=h;
+// section 8 placeholder merges: relabel numbers after 7 groups -> 2..7, then 9,10
+["公式","-ar","-er","-ir","詞幹變化","yo 不規則","變位表","gustar 型","反身動詞"].forEach((t,i)=>{const ids=[1,2,3,4,5,6,7,8,9];nav+=`<a href="#s${ids[i]}">${t}</a>`;});
+document.getElementById("nav").innerHTML=nav;
+document.getElementById("refl").innerHTML=R.map(v).join("");
+document.getElementById("gus").innerHTML=[["gustar","喜歡"],["encantar","非常喜歡"],["interesar","感興趣"],["doler","痛"],["parecer","覺得"],["apetecer","想要"]].map(v).join("");
+const E={
+hablar:["Hablo español con mis amigos.|我和朋友說西班牙文。"],
+trabajar:["Trabajo en un banco.|我在銀行工作。"],
+estudiar:["Estudio inglés por la noche.|我晚上學英文。"],
+comprar:["Compro pan todos los días.|我每天買麵包。"],
+necesitar:["Necesito un café.|我需要一杯咖啡。"],
+escuchar:["Escucho música en casa.|我在家聽音樂。"],
+tomar:["Tomo agua con el almuerzo.|我午餐時喝水。","Tomo el autobús a la escuela.|我搭公車去學校。"],
+desayunar:["Desayuno a las ocho.|我八點吃早餐。"],
+cenar:["Cenamos en casa.|我們在家吃晚餐。"],
+bailar:["Ella baila muy bien.|她舞跳得很好。"],
+cantar:["Mi madre canta en el coche.|我媽媽在車裡唱歌。"],
+viajar:["Viajo a España en verano.|我夏天去西班牙旅行。"],
+caminar:["Camino al trabajo todos los días.|我每天走路去上班。"],
+mirar:["Miro la televisión por la noche.|我晚上看電視。"],
+preguntar:["Pregunto el precio.|我問價錢。"],
+contestar:["Contesto la pregunta del profesor.|我回答老師的問題。"],
+esperar:["Espero el autobús.|我在等公車。","Espero verte pronto.|我希望很快見到你。"],
+ayudar:["Ayudo a mi madre en la cocina.|我在廚房幫媽媽的忙。"],
+entrar:["Entramos en el restaurante.|我們走進餐廳。"],
+llegar:["Llego a casa a las seis.|我六點到家。"],
+terminar:["Termino el trabajo a las cinco.|我五點完成工作。"],
+usar:["Uso el ordenador en el trabajo.|我在工作時用電腦。"],
+visitar:["Visitamos a mis abuelos el domingo.|我們星期天去看我的祖父母。"],
+cocinar:["Mi padre cocina muy bien.|我爸爸很會煮菜。"],
+pagar:["Pago con tarjeta.|我用卡付款。"],
+buscar:["Busco una farmacia.|我在找藥局。"],
+practicar:["Practico español cada día.|我每天練習西班牙文。"],
+llamar:["Llamo a mi madre por teléfono.|我打電話給媽媽。","Llamo al camarero.|我叫服務生過來。"],
+nadar:["Nado en la piscina.|我在游泳池游泳。"],
+lavar:["Lavo la ropa los sábados.|我星期六洗衣服。"],
+alquilar:["Alquilo un piso en el centro.|我在市中心租一間公寓。"],
+olvidar:["Siempre olvido el paraguas.|我總是忘記帶傘。"],
+preparar:["Preparo la cena.|我準備晚餐。"],
+invitar:["Invito a mis amigos a cenar.|我邀請朋友來吃晚餐。"],
+enseñar:["Enseño inglés en una escuela.|我在學校教英文。","Te enseño mis fotos.|我給你看我的照片。"],
+tocar:["Toca la guitarra muy bien.|他吉他彈得很好。","Toco la mesa con la mano.|我用手摸桌子。"],
+ganar:["Mi equipo siempre gana.|我的球隊總是贏。","Gano mil euros al mes.|我一個月賺一千歐元。"],
+pasar:["Paso las vacaciones en la playa.|我在海邊度過假期。","Paso por tu casa.|我經過你家。"],
+celebrar:["Celebramos mi cumpleaños.|我們慶祝我的生日。"],
+limpiar:["Limpio la casa los domingos.|我星期天打掃家裡。"],
+comer:["Como arroz con pollo.|我吃雞肉飯。"],
+beber:["Bebo mucha agua.|我喝很多水。"],
+leer:["Leo el periódico por la mañana.|我早上看報紙。"],
+vender:["Vendemos frutas y verduras.|我們賣水果和蔬菜。"],
+aprender:["Aprendo español en clase.|我在課堂上學西班牙文。"],
+correr:["Corro en el parque.|我在公園跑步。"],
+comprender:["No comprendo la pregunta.|我不理解這個問題。"],
+responder:["Respondo al correo.|我回覆郵件。"],
+creer:["Creo en ti.|我相信你。","Creo que es tarde.|我認為時間晚了。"],
+deber:["Debes estudiar más.|你應該多讀書。"],
+vivir:["Vivo en Taipéi.|我住在台北。","Vivimos bien aquí.|我們在這裡生活得很好。"],
+escribir:["Escribo un correo.|我寫一封郵件。"],
+abrir:["Abro la ventana.|我打開窗戶。"],
+recibir:["Recibo un mensaje.|我收到一則訊息。"],
+decidir:["Decido comprar el libro.|我決定買這本書。"],
+subir:["Subo al tercer piso.|我上到三樓。"],
+compartir:["Comparto el piso con un amigo.|我和朋友合住一間公寓。"],
+asistir:["Asisto a clase los lunes.|我星期一去上課。"],
+describir:["Describo mi casa.|我描述我的家。"],
+partir:["El tren parte a las ocho.|火車八點出發。"],
+querer:["Quiero un café.|我想要一杯咖啡。","Quiero mucho a mi familia.|我很愛我的家人。"],
+empezar:["La clase empieza a las nueve.|課九點開始。"],
+pensar:["Pienso en mi familia.|我在想我的家人。","Pienso que es una buena idea.|我認為這是個好主意。"],
+preferir:["Prefiero el té.|我比較喜歡茶。"],
+entender:["No entiendo esta palabra.|我不懂這個字。"],
+cerrar:["Cierro la puerta.|我關上門。"],
+perder:["Pierdo las llaves.|我弄丟鑰匙。","Mi equipo pierde hoy.|我的球隊今天輸了。"],
+sentir:["Siento frío.|我覺得冷。"],
+poder:["¿Puedes ayudarme?|你可以幫我嗎？"],
+volver:["Vuelvo a casa a las seis.|我六點回家。"],
+dormir:["Duermo ocho horas.|我睡八小時。"],
+encontrar:["Encuentro mis gafas.|我找到我的眼鏡。"],
+costar:["¿Cuánto cuesta este libro?|這本書多少錢？"],
+recordar:["Recuerdo tu nombre.|我記得你的名字。"],
+almorzar:["Almuerzo en el trabajo.|我在公司吃午餐。"],
+llover:["Hoy llueve mucho.|今天雨下得很大。"],
+jugar:["Los niños juegan en el parque.|孩子們在公園玩。","Mi equipo juega el sábado.|我的球隊星期六比賽。"],
+pedir:["Pido una paella.|我點一份西班牙燉飯。","Te pido un favor.|我想請你幫個忙。"],
+seguir:["Sigo estudiando español.|我繼續學西班牙文。","Sigo a mi guía.|我跟著我的導遊。"],
+repetir:["Repito la pregunta.|我重複這個問題。"],
+servir:["Sirvo la comida a los clientes.|我為客人上菜。","Este cable sirve para cargar el móvil.|這條線可以拿來幫手機充電。"],
+hacer:["Hago la tarea por la tarde.|我下午做功課。"],
+poner:["Pongo el libro en la mesa.|我把書放在桌上。"],
+salir:["Salgo de casa a las siete.|我七點出門。","Salgo del trabajo a las cinco.|我五點離開公司。"],
+traer:["Traigo el pan.|我帶麵包來。"],
+conocer:["Conozco a Ana.|我認識 Ana。"],
+saber:["Sé tu nombre.|我知道你的名字。","Sé cocinar.|我會煮菜。"],
+ver:["Veo una película.|我看一部電影。"],
+dar:["Doy un regalo a mi madre.|我送媽媽一份禮物。"],
+venir:["Vengo a tu casa mañana.|我明天來你家。"],
+tener:["Tengo un perro.|我有一隻狗。"],
+decir:["Digo la verdad.|我說實話。"],
+oír:["Oigo un ruido.|我聽見一個聲音。"],
+parecer:["Parece fácil.|看起來很容易。","¿Qué te parece?|你覺得怎麼樣？"],
+ofrecer:["Ofrezco café a mis invitados.|我提供咖啡給客人。"],
+gustar:["Me gusta el café.|我喜歡咖啡。"],
+encantar:["Me encanta la música.|我超愛音樂。"],
+interesar:["Me interesa la historia.|我對歷史感興趣。"],
+doler:["Me duele la cabeza.|我頭痛。"],
+apetecer:["Me apetece un helado.|我想吃冰淇淋。"],
+llamarse:["Me llamo Ana.|我叫 Ana。"],
+levantarse:["Me levanto a las siete.|我七點起床。"],
+ducharse:["Me ducho por la mañana.|我早上淋浴。"],
+acostarse:["Me acuesto a las once.|我十一點上床睡覺。"],
+despertarse:["Me despierto temprano.|我很早醒來。"],
+vestirse:["Me visto rápido.|我很快穿好衣服。"],
+sentarse:["Me siento aquí.|我坐在這裡。"],
+ponerse:["Me pongo el abrigo.|我穿上外套。"],
+lavarse:["Me lavo las manos.|我洗手。"]};
+
+const EN=[["o","as","a","amos","áis","an"],["o","es","e","emos","éis","en"],["o","es","e","imos","ís","en"]];
+const OV={freír:"frío fríes fríe freímos freís fríen",tener:"tengo tienes tiene tenemos tenéis tienen",venir:"vengo vienes viene venimos venís vienen",decir:"digo dices dice decimos decís dicen",oír:"oigo oyes oye oímos oís oyen",ver:"veo ves ve vemos veis ven",dar:"doy das da damos dais dan",seguir:"sigo sigues sigue seguimos seguís siguen"};
+const SC={};
+Object.assign(SC,{acordar:"o→ue",divertir:"e→ie",acostar:"o→ue",despertar:"e→ie",vestir:"e→i",sentar:"e→ie"});
+G[3][2].forEach(a=>SC[a[0]]=a[2]);
+const YO={};G[4][2].forEach(a=>YO[a[0]]=a[2]);
+const IMP0={llover:[2],costar:[2,5]};const IMP=new Proxy(IMP0,{get:(o,k)=>(TENSE==="imv"||TENSE==="neg")?[1,2,3,4,5]:o[k]});
+const RS=new Set(R.map(a=>a[0]));
+const TAB=new Set([...G[3][2].map(a=>a[0]),...G[4][2].map(a=>a[0]),...RS]);
+function conj(k){
+ const r=RS.has(k),b=r?k.slice(0,-2):k;
+ const idx={ar:0,er:1,ir:2,"ír":2}[b.slice(-2)],stem=b.slice(0,-2);
+ const reg=EN[idx].map(e=>stem+e);let f=reg.slice();
+ if(OV[b])f=OV[b].split(" ");
+ else{
+  if(SC[b]){const[from,to]=SC[b].split("→"),i=stem.lastIndexOf(from),s2=stem.slice(0,i)+to+stem.slice(i+1);
+   [0,1,2,5].forEach(j=>f[j]=s2+EN[idx][j]);}
+  if(YO[b])f[0]=YO[b];
+ }
+ return{f,reg,r};
+}
+function ctab(k){
+ const{f,reg,r}=cj(k),P=["me","te","se","nos","os","se"],N=["yo","tú","él / ella / usted","nosotros","vosotros","ellos / ellas / ustedes"];
+ const cell=i=>IMP[k]&&!IMP[k].includes(i)?`<td style="color:var(--mute)">—</td>`:`<td class="${f[i]!==reg[i]?"x":""}">${r?P[i]+" ":""}${f[i]}</td>`;
+ const any=f.some((x,i)=>x!==reg[i]&&!(IMP[k]&&!IMP[k].includes(i)));
+ return`<table class="ct"><tr><th></th><th>單數</th><th></th><th>複數</th></tr>`+
+ [[0,3],[1,4],[2,5]].map(([a,c])=>`<tr><td class="l">${N[a]}</td>${cell(a)}<td class="l">${N[c]}</td>${cell(c)}</tr>`).join("")+`</table><p class="cap">點擊變位或例句聽發音</p>`;
+}
+
+const EI={
+ser:["身分|Soy estudiante.|我是學生。","來自|Soy de Taiwán.|我來自台灣。","特質|Mi casa es grande.|我家很大。","時間|Son las tres.|現在三點。"],
+estar:["位置|El banco está cerca.|銀行在附近。","狀態|Estoy cansado.|我很累。"],
+ir:["去|Voy a la escuela.|我去學校。","ir a + 原形|Voy a comer pizza.|我要吃披薩。"],
+tener:["有|Tengo un perro.|我有一隻狗。","年齡|Tengo veinte años.|我二十歲。","tener que + 原形|Tengo que estudiar.|我必須讀書。"],
+hacer:["做|Hago la tarea.|我做功課。","天氣|Hace calor.|天氣很熱。"],
+querer:["想要|Quiero un café.|我想要一杯咖啡。","愛|Quiero a mi familia.|我愛我的家人。"],
+poder:["能力|Puedo nadar.|我會游泳。","許可|¿Puedo entrar?|我可以進來嗎？"],
+venir:["來|Vengo a tu casa.|我來你家。","來自|Vengo de Taipéi.|我從台北來。"],
+saber:["知道|Sé tu nombre.|我知道你的名字。","會|Sé cocinar.|我會煮菜。"],
+dar:["給|Doy un regalo a mi madre.|我送媽媽一份禮物。","搭配|Doy un paseo por el parque.|我在公園散步。"]};
+Object.assign(E,{
+llevar:["Llevo un libro.|我帶一本書。","Llevo falda hoy.|我今天穿裙子。"],
+quedar:["Quedo con Ana a las ocho.|我八點和 Ana 約好。"],
+cambiar:["Cambio dinero en el banco.|我在銀行換錢。"],
+pasear:["Paseo por el parque.|我在公園散步。"],
+reservar:["Reservo una mesa para dos.|我預訂兩人的桌位。"],
+regalar:["Regalo flores a mi madre.|我送花給媽媽。"],
+bajar:["Bajo del autobús aquí.|我在這裡下公車。"],
+girar:["Giro a la derecha.|我向右轉。"],
+cruzar:["Cruzo la calle.|我過馬路。"],
+cumplir:["Cumplo veinte años hoy.|我今天滿二十歲。"],
+contar:["Cuento hasta diez.|我數到十。","Cuento una historia.|我講一個故事。"],
+comenzar:["Comienzo a trabajar a las nueve.|我九點開始工作。"],
+coger:["Cojo un libro.|我拿一本書。","Cojo el autobús.|我搭公車。"],
+bañarse:["Me baño por la noche.|我晚上洗澡。"],
+peinarse:["Me peino antes de salir.|我出門前梳頭。"],
+afeitarse:["Mi padre se afeita cada día.|我爸爸每天刮鬍子。"],
+quedarse:["Me quedo en casa hoy.|我今天待在家。"],
+sentirse:["Me siento bien.|我覺得很好。"]});
+OV.haber="he has ha hemos habéis han";I.forEach(r=>OV[r[0]]=r[1]);
+EI.haber=["有（hay）|Hay un banco aquí.|這裡有一間銀行。"];
+const IG=[["ser","是"],["estar","在；處於"],["ir","去"],["tener","有"],["hacer","做"],["querer","想要；愛"],["poder","能夠"],["venir","來"],["saber","知道；會"],["dar","給"],["haber","有（hay）"]];
+IG.forEach(([k])=>{E[k]=EI[k].map(x=>x.split("|").slice(1).join("|"))});
+document.getElementById("irr").innerHTML=IG.map(([k,z])=>`<div class="v" data-k="${k}" data-z="${EI[k].map(x=>x.split("|")[0]).join("；")}"><b>${k}</b><span class="csp" data-s="${k}">🔊</span><span>${z}</span></div>`).join("");
+let MODE="view",TENSE="pres",LAST=null;
+const PR=["yo","tú","él / ella / usted","nosotros","vosotros","ellos / ellas / ustedes"];
+const norm=x=>x.normalize("NFC").trim().toLowerCase().replace(/\s+/g," ");
+const bare=x=>x.replace(/ñ/g,"\u0001").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\u0001/g,"ñ");
+const IP={freír:"freí freíste frio freímos freísteis frieron",ser:"fui fuiste fue fuimos fuisteis fueron",ir:"fui fuiste fue fuimos fuisteis fueron",dar:"di diste dio dimos disteis dieron",ver:"vi viste vio vimos visteis vieron"};
+const IS={conducir:"conduj",traducir:"traduj",estar:"estuv",tener:"tuv",hacer:"hic",querer:"quis",poder:"pud",venir:"vin",saber:"sup",poner:"pus",haber:"hub",decir:"dij",traer:"traj"};
+const PSC={hervir:"e→i",mentir:"e→i",sugerir:"e→i",morir:"o→u",divertir:"e→i",sentir:"e→i",preferir:"e→i",pedir:"e→i",seguir:"e→i",repetir:"e→i",servir:"e→i",vestir:"e→i",dormir:"o→u"};
+function conjI(k){
+ const r=RS.has(k),b=r?k.slice(0,-2):k,idx={ar:0,er:1,ir:2,"ír":2}[b.slice(-2)],stem=b.slice(0,-2);
+ const reg=(idx?["í","iste","ió","imos","isteis","ieron"]:["é","aste","ó","amos","asteis","aron"]).map(e=>stem+e);let f=reg.slice();
+ if(IP[b])f=IP[b].split(" ");
+ else if(IS[b]){f=["e","iste","o","imos","isteis","ieron"].map(e=>IS[b]+e);if(b==="hacer")f[2]="hizo";if(/^(decir|traer|conducir|traducir)$/.test(b))f[5]=IS[b]+"eron"}
+ else if(idx===0){const y=/c$/.test(stem)?stem.slice(0,-1)+"qu":/g$/.test(stem)?stem+"u":/z$/.test(stem)?stem.slice(0,-1)+"c":stem;f[0]=y+"é"}
+ else if(PSC[b]){const[from,to]=PSC[b].split("→"),i=stem.lastIndexOf(from),s2=stem.slice(0,i)+to+stem.slice(i+1);f[2]=s2+"ió";f[5]=s2+"ieron"}
+ else if(/[aeiou]$/.test(stem))f=[stem+"í",stem+"íste",stem+"yó",stem+"ímos",stem+"ísteis",stem+"yeron"];
+ return{f,reg,r}}
+const cj=k=>(CJ[TENSE]||conj)(k);
+const FT={pres:[["-ar","-o -as -a -amos -áis -an"],["-er","-o -es -e -emos -éis -en"],["-ir","-o -es -e -imos -ís -en"]],pret:[["-ar","-é -aste -ó -amos -asteis -aron"],["-er / -ir","-í -iste -ió -imos -isteis -ieron"]]};
+const FB={pres:"<p>-er 與 -ir 只有 nosotros、vosotros 不同。</p>",pret:"<p>-er 與 -ir 字尾完全相同；yo、él 要寫重音符號。-ar 的 nosotros 與現在式同形，要看上下文。</p><p>-car / -gar / -zar 的 yo 拼字會變。</p>"};
+const TN={pres:"描述現在的習慣、經常性的動作與一般事實，也可以表示近期的安排。",pret:"描述過去已經完成的單一事件，有明確的時間點；常搭配 ayer、anoche、el año pasado。"};
+function renderF0(){document.getElementById("ft").innerHTML="<tr><th></th><th>yo</th><th>tú</th><th>él/ella<br>usted</th><th>nosotros</th><th>vosotros</th><th>ellos/ellas<br>ustedes</th></tr>"+FT[TENSE].map(([l,x])=>`<tr><td class="l">${l}</td>${x.split(" ").map(e=>`<td>${e}</td>`).join("")}</tr>`).join("");document.getElementById("fb").innerHTML=FB[TENSE];document.getElementById("tn").textContent=TN[TENSE]}
+const GL={};G.forEach(g=>g[2].forEach(a=>GL[a[0]]=a[1]));R.forEach(a=>GL[a[0]]=a[1]);IG.forEach(a=>GL[a[0]]=GL[a[0]]||a[1]);
+const PG=[["a","-ar 規則動詞","去掉 -ar，加上 -é, -aste, -ó, -amos, -asteis, -aron。","-ar"],["e","-er 規則動詞","-er 與 -ir 字尾完全相同：-í, -iste, -ió, -imos, -isteis, -ieron。","-er"],["i","-ir 規則動詞","-er 與 -ir 字尾完全相同：-í, -iste, -ió, -imos, -isteis, -ieron。","-ir"],["sp","yo 拼字變化（-car / -gar / -zar）","只有 yo 為了保持發音而改拼字（c→qu、g→gu、z→c），其餘規則。","yo 拼字"],["st","第三人稱詞幹變化","-ir 動詞在 él / ellos 兩格，詞幹母音會變（e→i、o→u）；其餘規則。","詞幹變化"],["y","i 變 y 的動詞","詞幹以母音結尾：él / ellos 的 i 變 y，其餘的 í 要加重音。","i→y"],["is","詞幹不規則","詞幹整個改變，字尾換成沒有重音的 -e, -iste, -o, -imos, -isteis, -ieron。<br>例外：hacer 的 él / ella 要改拼字（c→z）。traer、decir、conducir、traducir 的 ellos 是 -eron。","詞幹不規則"],["ip","完全不規則","ser 與 ir 在這個時態同形。ver、dar 的字尾沒有重音符號。","完全不規則"]];
+function pcls(k){if(IP[k])return"ip";if(IS[k])return"is";if(PSC[k])return"st";const t=k.slice(-2),st=k.slice(0,-2);if(t==="ar")return/[cgz]$/.test(st)?"sp":"a";if(/[aeiou]$/.test(st))return"y";return t==="er"?"e":"i"}
+const PV={};G.forEach(g=>g[2].forEach(a=>{const c=pcls(a[0]);(PV[c]=PV[c]||[]).push(a)}));
+(PV.ip=PV.ip||[]).unshift(["ser",GL.ser],["ir",GL.ir]);(PV.is=PV.is||[]).unshift(["estar",GL.estar]);PV.is.push(["haber",GL.haber]);
+const PGs=PG.filter(g=>PV[g[0]]);
+document.getElementById("groupsP").innerHTML=PGs.map((g,j)=>`<div class="card" id="p-${g[0]}"><h2><span class="n">${j+2}</span>${g[1]}</h2>${g[2]?`<p class="note">${g[2]}</p>`:""}<div class="grid">${PV[g[0]].map(a=>v([a[0],a[1]])).join("")}</div></div>`).join("");
+const NAV0=document.getElementById("nav").innerHTML,NAVP='<a href="#s1">公式</a>'+PGs.map(g=>`<a href="#p-${g[0]}">${g[3]}</a>`).join("")+'<a href="#s8">gustar 型</a><a href="#s9">反身動詞</a>';
+function setPret(){const p=TENSE==="pret";document.getElementById("groups").hidden=p;document.getElementById("s7").hidden=p;document.getElementById("groupsP").hidden=!p;document.getElementById("nav").innerHTML=p?NAVP:NAV0;[...document.querySelectorAll(".card h2 .n")].filter(n=>!n.closest("[hidden]")).forEach((n,i)=>n.textContent=i+1)}
+const cards=()=>[...document.querySelectorAll(".v")].filter(c=>!c.closest("#irr,#gus"));
+cards().forEach(c=>{const i=c.querySelector("i");c._i0=i?i.textContent:""});
+function refreshTags(){cards().forEach(c=>{let t=c._i0;if(TENSE==="pret"){t=""}
+ let i=c.querySelector("i");if(!i){if(!t)return;i=document.createElement("i");c.insertBefore(i,c.querySelector(".ex"))}i.textContent=t})}
+function closeAll(){document.querySelectorAll(".v.open").forEach(c=>{c.querySelector(".ex").remove();c.classList.remove("open")})}
+function toast(m){const T=document.getElementById("toast");T.textContent=m;T.classList.add("show");clearTimeout(T._t);T._t=setTimeout(()=>T.classList.remove("show"),2200)}
+function speak(x){const S=window.speechSynthesis;if(!S){toast("此瀏覽器不支援語音");return}S.cancel();const u=new SpeechSynthesisUtterance(x),all=S.getVoices(),es=all.filter(q=>/^es/i.test(q.lang.replace("_","-")));u.lang="es-ES";const vo=es.find(q=>/^es-ES/i.test(q.lang.replace("_","-")))||es[0];if(vo)u.voice=vo;else if(all.length)toast("這個裝置沒有西班牙文語音，可能念不準");S.speak(u)}
+if(window.speechSynthesis){speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices()}
+function pform(k){
+ const{f,reg,r}=cj(k),P=["me","te","se","nos","os","se"];
+ const cell=i=>{const off=IMP[k]&&!IMP[k].includes(i);return`<label${off?' class="off"':''}><span>${PR[i]}</span><input data-a="${r?P[i]+" ":""}${f[i]}" data-p="" data-x="${f[i]!==reg[i]?1:0}" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"${off?' disabled placeholder="—"':''}><small></small></label>`};
+ return`<div class="pf"><div class="pg">${[0,3,1,4,2,5].map(cell).join("")}</div><div class="acc">${[..."áéíóúñü"].map(c=>`<button type="button" data-c="${c}">${c}</button>`).join("")}</div><div class="pb"><button type="button" class="chk">檢查</button><button type="button" class="ans">解答</button><button type="button" class="rst">清除</button></div></div>`}
+function grade(pf,rv){let all=1;
+ pf.querySelectorAll("input:not(:disabled)").forEach(inp=>{const a=inp.dataset.a,val=norm(inp.value),s=inp.nextElementSibling,L=inp.parentElement;let t="",ok=0;
+  if(val===a){L.className="ok";ok=1}else if(val&&bare(val)===bare(a)){L.className="warn";t="注意重音"}else L.className="bad";
+  if(!ok)all=0;if(rv&&!ok)t="正解："+a;
+  s.innerHTML=(t?t+" ":"")+(ok||rv?`<span class="sp" data-s="${inp.dataset.p+a}">🔊</span>`:"")});
+ const sen=pf.closest(".ex").querySelector(".sen");if(sen)sen.hidden=!(all||rv)}
+document.addEventListener("focusin",e=>{if(e.target.matches(".pg input"))LAST=e.target});
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.matches(".pg input")){e.preventDefault();if(e.target.id==="ri"){Q&&Q.done?nextQ():rCheck()}else grade(e.target.closest(".pf"))}});
+document.addEventListener("mousedown",e=>{if(e.target.closest(".acc button"))e.preventDefault()});
+document.getElementById("bar").addEventListener("click",e=>{const m=e.target.dataset.m;if(!m)return;MODE=m;[...e.currentTarget.children].forEach(x=>x.classList.toggle("on",x.dataset.m===m));closeAll();document.querySelector("main").classList.toggle("rnd",m==="rnd");document.getElementById("rnd").hidden=m!=="rnd";if(m==="rnd")nextQ()});
+document.getElementById("tbar").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;TENSE=b.dataset.t;[...b.parentNode.children].forEach(x=>x.classList.toggle("on",x===b));closeAll();renderF();refreshTags();setPret();if(MODE==="rnd")nextQ()});
+const up=document.getElementById("up");
+addEventListener("scroll",()=>up.classList.toggle("show",scrollY>400),{passive:true});
+up.onclick=()=>scrollTo({top:0,behavior:"smooth"});
+document.addEventListener("click",e=>{
+ const t=e.target,sp=t.closest(".sp,.csp");
+ if(sp){speak(sp.dataset.s);return}
+ if(t.closest("#rc")){rCheck();return}
+ if(t.closest("#rk")){rReveal();return}
+ if(t.closest("#rn")){nextQ();return}
+ const rb=t.closest("[data-rp]");if(rb){RP=rb.dataset.rp;[...rb.parentNode.querySelectorAll("button")].forEach(x=>x.classList.toggle("on",x===rb));nextQ();return}
+ const ab=t.closest(".acc button");
+ if(ab){const pf=ab.closest(".pf"),i=LAST&&pf.contains(LAST)&&!LAST.disabled?LAST:pf.querySelector("input:not(:disabled)");if(!i)return;const p=i.selectionStart==null?i.value.length:i.selectionStart,q=i.selectionEnd==null?p:i.selectionEnd;i.setRangeText(ab.dataset.c,p,q,"end");i.focus();return}
+ if(t.closest(".ans")){grade(t.closest(".pf"),1);return}
+  if(t.closest(".chk")){grade(t.closest(".pf"));return}
+ if(t.closest(".rst")){const pf=t.closest(".pf");pf.querySelectorAll("input").forEach(i=>{i.value="";i.parentElement.className=i.disabled?"off":"";i.nextElementSibling.textContent=""});const sen=pf.closest(".ex").querySelector(".sen");if(sen)sen.hidden=true;const f0=pf.querySelector("input:not(:disabled)");if(f0)f0.focus();return}
+ const c=t.closest(".v");if(!c||t.closest(".ex"))return;
+ const k=c.dataset.k,ex=(TENSE==="pret"&&EP[k])||E[k];if(!ex)return;
+ let b=c.querySelector(".ex");if(b){b.remove();c.classList.remove("open");return}
+ const ms=(TENSE==="pret"&&c.dataset.zp||c.dataset.z).split("；"),lab=ms.length===ex.length;
+ const sen=ex.map((x,i)=>{const[p,q]=x.split("|");return`<p>${lab?`<em>${ms[i]}</em>`:""}<span class="es">${p}<span class="sp" data-s="${p}">🔊</span></span><span class="zh">${q}</span></p>`}).join("");
+ b=document.createElement("div");b.className="ex";
+ b.innerHTML=c.closest("#gus")?sen:MODE==="practice"?pform(k):ctab(k)+sen+pairNote(k);
+ c.appendChild(b);c.classList.add("open");
+ if(MODE==="practice"&&!c.closest("#gus")){const f=b.querySelector("input:not(:disabled)");if(f)f.focus({preventScroll:true})}});
+const EP={},EIP={};
+`hablar|Ayer hablé con mi profesor.|我昨天和老師說話。
+trabajar|Trabajé en un banco el año pasado.|我去年在銀行工作過。
+estudiar|Anoche estudié inglés.|我昨晚學了英文。
+comprar|Ayer compré pan.|我昨天買了麵包。
+necesitar|Ayer necesité tu ayuda.|我昨天需要你的幫忙。
+escuchar|Escuché música toda la tarde.|我整個下午都在聽音樂。
+tomar|Tomé agua con el almuerzo.|我午餐時喝了水。|Tomé el autobús a la escuela.|我搭公車去了學校。
+desayunar|Desayuné a las ocho.|我八點吃了早餐。
+cenar|Cenamos en casa ayer.|我們昨天在家吃晚餐。
+bailar|Ella bailó muy bien en la fiesta.|她在派對上跳得很好。
+cantar|Mi madre cantó en el coche.|我媽媽在車裡唱了歌。
+viajar|Viajé a España el verano pasado.|我去年夏天去西班牙旅行了。
+caminar|Caminé al trabajo esta mañana.|我今天早上走路去上班。
+mirar|Miré la televisión anoche.|我昨晚看了電視。
+preguntar|Pregunté el precio.|我問了價錢。
+contestar|Contesté la pregunta del profesor.|我回答了老師的問題。
+esperar|Esperé el autobús media hora.|我等了半小時的公車。
+ayudar|Ayudé a mi madre en la cocina.|我在廚房幫了媽媽。
+entrar|Entramos en el restaurante.|我們走進了餐廳。
+llegar|Llegué a casa a las seis.|我六點到了家。
+terminar|Terminé el trabajo a las cinco.|我五點完成了工作。
+usar|Usé el ordenador en el trabajo.|我在工作時用了電腦。
+visitar|Visitamos a mis abuelos el domingo.|我們星期天去看了祖父母。
+cocinar|Mi padre cocinó muy bien anoche.|我爸爸昨晚煮得很好。
+pagar|Pagué con tarjeta.|我用卡付了款。
+buscar|Busqué una farmacia.|我找了一間藥局。
+practicar|Practiqué español todo el día.|我練習了一整天西班牙文。
+llamar|Llamé a mi madre por teléfono.|我打電話給了媽媽。|Llamé al camarero.|我叫了服務生過來。
+nadar|Nadé en la piscina.|我在游泳池游了泳。
+lavar|Lavé la ropa el sábado.|我星期六洗了衣服。
+alquilar|Alquilé un piso en el centro.|我在市中心租了一間公寓。
+olvidar|Olvidé el paraguas en casa.|我把傘忘在家裡了。
+preparar|Preparé la cena.|我準備了晚餐。
+invitar|Invité a mis amigos a cenar.|我邀請了朋友來吃晚餐。
+enseñar|Enseñé inglés en una escuela.|我在學校教過英文。|Te enseñé mis fotos.|我給你看了我的照片。
+tocar|Toqué la guitarra en la fiesta.|我在派對上彈了吉他。|Toqué la mesa con la mano.|我用手摸了桌子。
+ganar|Mi equipo ganó ayer.|我的球隊昨天贏了。|Gané mil euros el mes pasado.|我上個月賺了一千歐元。
+pasar|Pasé las vacaciones en la playa.|我在海邊度過了假期。|Pasé por tu casa ayer.|我昨天經過了你家。
+celebrar|Celebramos mi cumpleaños el sábado.|我們星期六慶祝了我的生日。
+limpiar|Limpié la casa el domingo.|我星期天打掃了家裡。
+llevar|Llevé un libro a clase.|我帶了一本書去上課。|Llevé falda a la fiesta.|我穿了裙子去派對。
+quedar|Quedé con Ana a las ocho.|我和 Ana 約在八點。
+cambiar|Cambié dinero en el banco.|我在銀行換了錢。
+pasear|Paseé por el parque.|我在公園散了步。
+reservar|Reservé una mesa para dos.|我預訂了兩人的桌位。
+regalar|Regalé flores a mi madre.|我送了花給媽媽。
+bajar|Bajé del autobús aquí.|我在這裡下了公車。
+girar|Giré a la derecha.|我向右轉了。
+cruzar|Crucé la calle.|我過了馬路。
+comer|Comí arroz con pollo.|我吃了雞肉飯。
+beber|Bebí mucha agua.|我喝了很多水。
+leer|Leí el periódico esta mañana.|我今早看了報紙。
+vender|Vendimos frutas y verduras.|我們賣過水果和蔬菜。
+aprender|Aprendí español en clase.|我在課堂上學會了西班牙文。
+correr|Corrí en el parque.|我在公園跑了步。
+comprender|No comprendí la pregunta.|我沒有理解這個問題。
+responder|Respondí al correo.|我回覆了郵件。
+creer|Creí en ti.|我當時相信過你。|Creí que era tarde.|我以為已經晚了。
+deber|Debiste estudiar más.|你當時應該多讀書。
+vivir|Viví en Taipéi cinco años.|我在台北住了五年。|Vivimos bien allí.|我們在那裡生活得很好。
+escribir|Escribí un correo.|我寫了一封郵件。
+abrir|Abrí la ventana.|我打開了窗戶。
+recibir|Recibí un mensaje.|我收到了一則訊息。
+decidir|Decidí comprar el libro.|我決定買這本書了。
+subir|Subí al tercer piso.|我上到了三樓。
+compartir|Compartí el piso con un amigo.|我和朋友合住過一間公寓。
+asistir|Asistí a clase el lunes.|我星期一去上了課。
+describir|Describí mi casa.|我描述了我的家。
+partir|El tren partió a las ocho.|火車八點出發了。
+cumplir|Cumplí veinte años ayer.|我昨天滿了二十歲。
+querer|Quise ayudarte ayer.|我昨天想幫你。|Quise mucho a mi abuela.|我很愛過我的奶奶。
+empezar|La clase empezó a las nueve.|課九點開始了。
+pensar|Pensé en mi familia.|我想了我的家人。|Pensé que era una buena idea.|我當時認為這是個好主意。
+preferir|Preferí el té.|我當時比較想要茶。
+entender|No entendí esta palabra.|我沒聽懂這個字。
+cerrar|Cerré la puerta.|我關上了門。
+perder|Perdí las llaves.|我弄丟了鑰匙。|Mi equipo perdió ayer.|我的球隊昨天輸了。
+sentir|Sentí frío.|我當時覺得冷。
+poder|Pude terminar el trabajo.|我完成了工作。
+volver|Volví a casa a las seis.|我六點回到了家。
+dormir|Dormí ocho horas.|我睡了八小時。
+encontrar|Encontré mis gafas.|我找到了眼鏡。
+costar|El libro costó veinte euros.|這本書花了二十歐元。
+recordar|Recordé tu nombre.|我想起了你的名字。
+almorzar|Almorcé en el trabajo.|我在公司吃了午餐。
+llover|Ayer llovió mucho.|昨天下了很大的雨。
+jugar|Los niños jugaron en el parque.|孩子們在公園玩了。|Mi equipo jugó el sábado.|我的球隊星期六比賽了。
+pedir|Pedí una paella.|我點了一份西班牙燉飯。|Te pedí un favor.|我請你幫了個忙。
+seguir|Seguí estudiando español.|我繼續學了西班牙文。|Seguí a mi guía.|我跟著我的導遊走。
+repetir|Repetí la pregunta.|我重複了這個問題。
+servir|Serví la comida a los clientes.|我為客人上了菜。|Este cable sirvió para cargar el móvil.|這條線拿來幫手機充了電。
+contar|Conté hasta diez.|我數到了十。|Conté una historia.|我講了一個故事。
+comenzar|Comencé a trabajar a las nueve.|我九點開始工作了。
+hacer|Hice la tarea por la tarde.|我下午做了功課。
+poner|Puse el libro en la mesa.|我把書放在了桌上。
+salir|Salí de casa a las siete.|我七點出了門。|Salí del trabajo a las cinco.|我五點離開了公司。
+traer|Traje el pan.|我帶來了麵包。
+conocer|Conocí a Ana en Madrid.|我在馬德里認識了 Ana。
+saber|Supe la noticia ayer.|我昨天得知了這個消息。
+ver|Vi una película anoche.|我昨晚看了一部電影。
+dar|Di un regalo a mi madre.|我送了媽媽一份禮物。
+venir|Vine a tu casa ayer.|我昨天來了你家。
+tener|Tuve un examen ayer.|我昨天有一場考試。
+decir|Dije la verdad.|我說了實話。
+oír|Oí un ruido anoche.|我昨晚聽見了一個聲音。
+parecer|La película pareció larga.|電影看起來很長。|¿Qué te pareció?|你覺得怎麼樣？
+ofrecer|Ofrecí café a mis invitados.|我提供了咖啡給客人。
+coger|Cogí un libro.|我拿了一本書。|Cogí el autobús.|我搭了公車。
+gustar|Me gustó la película.|我喜歡這部電影。
+encantar|Me encantó la música.|我超愛這音樂。
+interesar|Me interesó la historia.|我對這段歷史感興趣。
+doler|Me dolió la cabeza.|我頭痛了。
+apetecer|Me apeteció un helado.|我當時想吃冰淇淋。
+llamarse|Mi abuelo se llamó Juan.|我爺爺名叫 Juan。
+levantarse|Me levanté a las siete.|我七點起床了。
+ducharse|Me duché por la mañana.|我早上淋了浴。
+acostarse|Me acosté a las once.|我十一點上床睡覺了。
+despertarse|Me desperté temprano.|我很早醒來了。
+vestirse|Me vestí rápido.|我很快穿好了衣服。
+sentarse|Me senté aquí.|我坐在了這裡。
+ponerse|Me puse el abrigo.|我穿上了外套。
+lavarse|Me lavé las manos.|我洗了手。
+bañarse|Me bañé por la noche.|我晚上洗了澡。
+peinarse|Me peiné antes de salir.|我出門前梳了頭。
+afeitarse|Mi padre se afeitó ayer.|我爸爸昨天刮了鬍子。
+quedarse|Me quedé en casa ayer.|我昨天待在了家。
+sentirse|Me sentí bien.|我當時覺得很好。`.split("\n").forEach(l=>{const p=l.split("|"),a=[];for(let i=1;i<p.length;i+=2)a.push(p[i]+"|"+p[i+1]);EP[p[0]]=a});
+`ser|身分|Fui estudiante en Madrid.|我曾在馬德里當學生。|事件|La fiesta fue el sábado.|派對是在星期六。|評價|El viaje fue muy largo.|這趟旅程很長。|人物|Mi abuelo fue médico.|我爺爺曾是醫生。
+estar|位置|Estuve en casa toda la tarde.|我整個下午都在家。|狀態|Estuve enfermo la semana pasada.|我上週生病了。
+ir|去|Fui a la escuela ayer.|我昨天去了學校。|去＋目的|Fuimos a comer pizza.|我們去吃了披薩。
+tener|有|Tuve una reunión ayer.|我昨天有一場會議。|tener que + 原形|Tuve que estudiar.|我得讀書了。
+hacer|做|Hice la tarea ayer.|我昨天做了功課。|天氣|Ayer hizo mucho calor.|昨天天氣很熱。
+querer|想要|Quise ayudarte ayer.|我昨天想幫你。|愛|Quise mucho a mi abuela.|我很愛過我的奶奶。
+poder|做得到|Pude terminar el trabajo.|我完成了工作。|做不到|No pude entrar.|我進不去。
+venir|來|Vine a tu casa ayer.|我昨天來了你家。|來自|Vine de Taipéi en tren.|我搭火車從台北過來。
+saber|得知|Supe la noticia ayer.|我昨天得知了這個消息。
+dar|給|Di un regalo a mi madre.|我送了媽媽一份禮物。|搭配|Di un paseo por el parque.|我在公園散了步。
+haber|發生|Hubo un accidente ayer.|昨天發生了一場事故。`.split("\n").forEach(l=>{const p=l.split("|"),a=[];for(let i=1;i<p.length;i+=3)a.push(p[i]+"|"+p[i+1]+"|"+p[i+2]);EIP[p[0]]=a;EP[p[0]]=a.map(x=>x.split("|").slice(1).join("|"))});
+document.querySelectorAll(".v").forEach(c=>{const e=EIP[c.dataset.k];if(e)c.dataset.zp=e.map(x=>x.split("|")[0]).join("；")});
+let RP="all",Q=null,QS={n:0,ok:0};
+document.getElementById("rnd").innerHTML=`<h2>隨機練習</h2><p class="note" id="rs"></p><div class="rq"><b id="rv"></b><span id="rz"></span><span class="sp" id="rsp">🔊</span></div><div class="pf"><div class="pg one"><label id="rl"><span id="rp"></span><input id="ri" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"><small></small></label></div><div class="acc">${[..."áéíóúñü"].map(c=>`<button type="button" data-c="${c}">${c}</button>`).join("")}</div></div><div class="pb"><button type="button" class="chk" id="rc">檢查</button><button type="button" id="rk">解答</button><button type="button" id="rx">清除</button><button type="button" id="rn">跳過</button></div>`;
+function nextQ0(){
+ const ks=Object.keys(GL).filter(k=>k!=="haber"&&rokv(k)&&(TENSE!=="imv"&&TENSE!=="neg"||!RS.has(k))),P=["me","te","se","nos","os","se"],g=id=>document.getElementById(id);let k,idx;
+ for(let n=0;n<99&&idx==null;n++){k=ks[Math.random()*ks.length|0];const{f,reg}=cj(k),m=IMP[k],o=[0,1,2,3,4,5].filter(i=>(!m||m.includes(i))&&(RP==="all"||f[i]!==reg[i]));if(o.length)idx=o[Math.random()*o.length|0]}
+ const{f,r}=cj(k);Q={a:(r?P[idx]+" ":"")+f[idx],p:"",done:0};
+ g("rv").textContent=k;g("rz").textContent=GL[k];g("rsp").dataset.s=k;
+ g("rp").textContent=PR[idx]+"｜"+TS[TENSE].zh;
+ const ri=g("ri");ri.value="";ri.readOnly=false;g("rl").className="";ri.nextElementSibling.textContent="";$("rs").textContent="";g("rn").textContent="跳過";ri.focus({preventScroll:true})}
+function rCheck(){if(!Q||Q.done)return;const ri=document.getElementById("ri"),val=norm(ri.value),a=Q.a;let c,t;
+ if(val===a){c="ok";t="正確"}else if(val&&bare(val)===bare(a)){c="warn";t="注意重音"}else{c="bad";t=""}
+ document.getElementById("rl").className=c;ri.nextElementSibling.innerHTML=t+(c==="ok"?` <span class="sp" data-s="${Q.p+a}">🔊</span>`:"");Q.done=(c==="ok")?1:0;document.getElementById("rn").textContent=c==="ok"?"下一題":"跳過"}
+/* ===== 級別 × 時態 擴充 ===== */
+const LN=["","A1","A2","B1","B2"];let LV=1,NAVX="";
+const TS={pres:{zh:"現在式",es:"presente",lv:1},perf:{zh:"現在完成式",es:"pretérito perfecto",lv:2},pret:{zh:"簡單過去式",es:"pretérito indefinido",lv:2},impf:{zh:"未完成過去式",es:"imperfecto",lv:2},fut:{zh:"未來式",es:"futuro simple",lv:2},cond:{zh:"條件式",es:"condicional simple",lv:2}};
+const $=id=>document.getElementById(id);
+const HF="he has ha hemos habéis han".split(" ");
+const PPI={romper:"roto",resolver:"resuelto",devolver:"devuelto",morir:"muerto",hacer:"hecho",escribir:"escrito",ver:"visto",decir:"dicho",poner:"puesto",abrir:"abierto",volver:"vuelto",describir:"descrito"};
+const rp=b=>{const s=b.slice(0,-2);return b.slice(-2)==="ar"?s+"ado":s+(/[aeoí]$/.test(s)?"ído":"ido")};
+const bs=k=>RS.has(k)?k.slice(0,-2):k;
+function conjP(k){const b=bs(k),r=RS.has(k);return{f:HF.map(h=>h+" "+(PPI[b]||rp(b))),reg:HF.map(h=>h+" "+rp(b)),r}}
+const IMPFI={ser:"era eras era éramos erais eran",ir:"iba ibas iba íbamos ibais iban",ver:"veía veías veía veíamos veíais veían"};
+function conjM(k){const b=bs(k),r=RS.has(k),s=b.slice(0,-2),reg=(b.slice(-2)==="ar"?["aba","abas","aba","ábamos","abais","aban"]:["ía","ías","ía","íamos","íais","ían"]).map(e=>s+e);return{f:IMPFI[b]?IMPFI[b].split(" "):reg,reg,r}}
+const STM={tener:"tendr",poner:"pondr",salir:"saldr",venir:"vendr",poder:"podr",querer:"querr",saber:"sabr",haber:"habr",hacer:"har",decir:"dir"};
+const mkF=en=>k=>{const b=bs(k),inf=b.replace("ír","ir"),r=RS.has(k),reg=en.map(e=>inf+e);return{f:STM[b]?en.map(e=>STM[b]+e):reg,reg,r}};
+const CJ={pret:conjI,perf:conjP,impf:conjM,fut:mkF(["é","ás","á","emos","éis","án"]),cond:mkF(["ía","ías","ía","íamos","íais","ían"])};
+Object.assign(FT,{perf:[["haber","he has ha hemos habéis han"]],impf:[["-ar","-aba -abas -aba -ábamos -abais -aban"],["-er / -ir","-ía -ías -ía -íamos -íais -ían"]],fut:[["原形 +","-é -ás -á -emos -éis -án"]],cond:[["原形 +","-ía -ías -ía -íamos -íais -ían"]]});
+Object.assign(FB,{perf:"<p>先變 haber，再加過去分詞；分詞不隨人稱變化。</p>",impf:"<p>只有 ser、ir、ver 三個不規則。-ar 的 nosotros 要加重音 -á；-er / -ir 全部帶 í。</p>",fut:"<p>字尾加在「原形」後面，三類動詞字尾相同。</p>",cond:"<p>詞幹與未來式相同，字尾是 -ía 系列。常用於禮貌請求：¿Podría…?</p>"});
+Object.assign(TN,{perf:"描述與現在仍有關聯的經驗或剛發生的事；常搭配 hoy、esta semana、ya、nunca。",impf:"描述過去的習慣、背景與狀態；常搭配 siempre、de niño、todos los días。",fut:"描述將發生的事、計畫與預測，也可以表示對現在的推測；常搭配 mañana、el año que viene。",cond:"用於禮貌請求、建議與假設，例如 Querría…、¿Podría…?"});
+const XGS={
+perf:{g:[["pa","-ar → -ado","","-ado"],["pi","-er / -ir → -ido","","-ido"],["pn","詞幹以母音結尾 → -ído","分詞的 í 要加重音。","-ído"],["px","不規則過去分詞","","不規則分詞"]],cls:k=>{const b=bs(k),s=b.slice(0,-2);return PPI[b]?"px":b.slice(-2)==="ar"?"pa":/[aeoí]$/.test(s)?"pn":"pi"},tag:k=>PPI[bs(k)]||""},
+impf:{g:[["ia","-ar 規則動詞","","-ar"],["ie","-er / -ir 規則動詞","","-er / -ir"],["ix","不規則動詞","只有 ser、ir、ver。","不規則"]],cls:k=>IMPFI[bs(k)]?"ix":bs(k).slice(-2)==="ar"?"ia":"ie",tag:k=>IMPFI[bs(k)]?IMPFI[bs(k)].split(" ")[0]:""},
+fut:{g:[["fr","規則：原形 + 字尾","","規則"],["fx","詞幹不規則","","詞幹不規則"]],cls:k=>STM[bs(k)]?"fx":"fr",tag:k=>STM[bs(k)]?STM[bs(k)]+"-":""}};
+XGS.cond=XGS.fut;
+const XP={
+perf:{hablar:["Hoy he hablado con mi madre.|今天我跟媽媽說過話。"],comer:["¿Has comido ya?|你吃過了嗎？"],vivir:["Hemos vivido en Taipéi dos años.|我們在台北住了兩年。"],hacer:["Hoy he hecho la tarea.|我今天做了功課。"],ver:["¿Has visto esta película?|你看過這部電影嗎？"],escribir:["Ya he escrito el correo.|我已經寫好郵件了。"],ir:["Nunca he ido a España.|我從沒去過西班牙。"],levantarse:["Me he levantado a las siete.|我七點起床了。"]},
+impf:{hablar:["De niño hablaba con mi abuela cada día.|小時候我每天和奶奶說話。"],comer:["Comíamos en casa los domingos.|我們以前週日在家吃飯。"],ser:["Mi casa era pequeña.|我家以前很小。"],ir:["Iba a la escuela en autobús.|我以前搭公車上學。"],ver:["Veía la tele por la noche.|我以前晚上看電視。"]},
+fut:{hablar:["Mañana hablaré con el profesor.|明天我會跟老師說話。"],tener:["Tendré tiempo el sábado.|我週六會有空。"],hacer:["¿Qué harás el domingo?|你星期天要做什麼？"],viajar:["El año que viene viajaremos a Japón.|明年我們會去日本旅行。"],poder:["Mañana podré ayudarte.|明天我可以幫你。"]},
+cond:{querer:["Querría un café, por favor.|我想要一杯咖啡，麻煩了。"],poder:["¿Podría abrir la ventana?|可以請你開窗嗎？"],tener:["Tendría que estudiar más.|我應該要多讀書。"],ser:["Sería mejor salir ahora.|現在出發會比較好。"]}};
+$("groupsP").insertAdjacentHTML("afterend",'<div id="groupsX" hidden></div>');
+function buildX(){const XG=XGS[TENSE],by={};Object.keys(GL).filter(k=>!RS.has(k)&&k!=="haber").forEach(k=>{const c=XG.cls(k);(by[c]=by[c]||[]).push(k)});
+ const gs=XG.g.filter(g=>by[g[0]]);
+ $("groupsX").innerHTML=gs.map((g,j)=>`<div class="card" id="x-${g[0]}"><h2><span class="n">${j+2}</span>${g[1]}</h2>${g[2]?`<p class="note">${g[2]}</p>`:""}<div class="grid">${by[g[0]].map(k=>v([k,GL[k],XG.tag(k)])).join("")}</div></div>`).join("");
+ NAVX='<a href="#s1">公式</a>'+gs.map(g=>`<a href="#x-${g[0]}">${g[3]}</a>`).join("")+'<a href="#s9">反身動詞</a>'}
+function setPret(){const T=TENSE,X=T!=="pres"&&T!=="pret";if(X)buildX();
+ $("groups").hidden=T!=="pres";$("s7").hidden=T!=="pres";$("groupsP").hidden=T!=="pret";$("groupsX").hidden=!X;$("s8").hidden=X;$("gbox").hidden=T!=="pres";
+ $("nav").innerHTML=T==="pres"?NAV0:T==="pret"?NAVP:NAVX;
+ [...document.querySelectorAll(".card h2 .n")].filter(n=>!n.closest("[hidden]")).forEach((n,i)=>n.textContent=i+1)}
+function renderF(){renderF0();if(TENSE==="ger")$("ft").insertAdjacentHTML("beforeend",'<tr><td class="l">+ 現在分詞</td><td colspan="6">-ar → <b>-ando</b>　｜　-er / -ir → <b>-iendo</b></td></tr>');if(TENSE==="perf")$("ft").insertAdjacentHTML("beforeend",'<tr><td class="l">+ 過去分詞</td><td colspan="6">-ar → <b>-ado</b>　｜　-er / -ir → <b>-ido</b></td></tr>')}
+function renderL(){$("lbar").innerHTML=[1,2,3,4].map(l=>`<button class="${l===LV?"on":""}" data-l="${l}"${l>2?' style="opacity:.45"':""}>${LN[l]}</button>`).join("");$("h1").textContent="DELE "+LN[LV]+" 動詞";document.title="DELE "+LN[LV]+" 動詞"}
+function renderT(){$("tbar").innerHTML=Object.keys(TS).filter(t=>TS[t].lv<=LV).map(t=>`<button class="${t===TENSE?"on":""}" data-t="${t}">${TS[t].zh}<small>${TS[t].es}・${LN[TS[t].lv]}</small></button>`).join("")}
+$("lbar").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const l=+b.dataset.l;if(l>2){toast("B1、B2 內容還在準備中");return}LV=l;if(TS[TENSE].lv>LV)TENSE="pres";renderL();renderT();closeAll();renderF();refreshTags();setPret();if(MODE==="rnd")nextQ()});
+document.addEventListener("click",e=>{const t=e.target;
+ const xb=t.closest(".xt button");if(xb){e.stopImmediatePropagation();xtSwitch(xb.closest(".ex"),xb.dataset.xt);return}
+ const tt=t.closest(".xtt");if(tt){e.stopImmediatePropagation();speak(tt.dataset.s);return}
+ if(t.closest(".sp,.csp,.ex"))return;const c=t.closest(".v");if(!c)return;e.stopImmediatePropagation();
+ const k=c.dataset.k;if(t.closest(".v>b"))speak(k);
+ const b=c.querySelector(".ex");if(b){b.remove();c.classList.remove("open");return}
+ openCard(c,k)},true);
+renderL();renderT();
+renderF();setPret();
+
+let MIX=0,QT=0;
+function updScope(){const b=document.querySelector('#tsc [data-mx="0"]');if(b)b.textContent="當前時態"}
+function nextQ(){updScope();if(QT&&window.czNext)return window.czNext();const T0=TENSE;if(MIX){const a=Object.keys(TS).filter(t=>TS[t].lv<=(RL===1?1:2));TENSE=a[Math.random()*a.length|0]}try{nextQ0()}finally{TENSE=T0}}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-mx]");if(b){MIX=+b.dataset.mx;document.querySelectorAll("[data-mx]").forEach(x=>x.classList.toggle("on",+x.dataset.mx===MIX));nextQ()}});
+
+/* ===== A2：現在進行式、肯定命令式、級別篩選 ===== */
+Object.assign(TS,{ger:{zh:"現在進行式",es:"estar + gerundio",lv:1},imv:{zh:"肯定命令式",es:"imperativo afirmativo",lv:1}});
+const GIX={freír:"friendo",venir:"viniendo",ir:"yendo",decir:"diciendo",poder:"pudiendo"},EST="estoy estás está estamos estáis están".split(" "),PP=["me","te","se","nos","os","se"];
+function gerd(b,irr){const s=b.slice(0,-2);if(b.slice(-2)==="ar")return s+"ando";if(irr){if(GIX[b])return GIX[b];if(PSC[b]){const[a,t]=PSC[b].split("→"),i=s.lastIndexOf(a);return s.slice(0,i)+t+s.slice(i+1)+"iendo"}}return s+(/[aeoí]$/.test(s)?"yendo":"iendo")}
+function conjG(k){const b=bs(k),r=RS.has(k),mk=g=>EST.map((e,i)=>(r?PP[i]+" ":"")+e+" "+g);return{f:mk(gerd(b,1)),reg:mk(gerd(b,0)),r:0}}
+const IMVI={ser:"sé sea seamos sed sean",ir:"ve vaya vayamos id vayan",saber:"sabe sepa sepamos sabed sepan",dar:"da dé demos dad den",estar:"está esté estemos estad estén",tener:"ten tenga tengamos tened tengan",hacer:"haz haga hagamos haced hagan",poner:"pon ponga pongamos poned pongan",salir:"sal salga salgamos salid salgan",venir:"ven venga vengamos venid vengan",decir:"di diga digamos decid digan",ver:"ve vea veamos ved vean",oír:"oye oiga oigamos oíd oigan"};
+const orth=(s,e)=>/^e/.test(e)?(/c$/.test(s)?s.slice(0,-1)+"qu":/g$/.test(s)?s+"u":/z$/.test(s)?s.slice(0,-1)+"c":s):s;
+function conjIm(k){const b=bs(k),t=b.slice(-2),ar=t==="ar",inf=b.slice(0,-2),pr=conj(k).f;let f;
+ if(IMVI[b])f=["",...IMVI[b].split(" ")];
+ else{const ys=pr[0].slice(0,-1),e=ar?["e","emos","en"]:["a","amos","an"],yo=YO[b]||OV[b];let ns=yo?ys:inf;
+  if(!yo&&t==="ir"&&PSC[b]){const[a,c]=PSC[b].split("→"),i=ns.lastIndexOf(a);ns=ns.slice(0,i)+c+ns.slice(i+1)}
+  f=["",pr[2],orth(ys,e[0])+e[0],orth(ns,e[1])+e[1],b.slice(0,-1)+"d",orth(ys,e[2])+e[2]]}
+ return{f,reg:IMVI[bs(k)]?f.map(x=>x&&x+"~"):f.slice(),r:0}}
+Object.assign(CJ,{ger:conjG,imv:conjIm});
+Object.assign(FT,{ger:[["estar",EST.join(" ")]],imv:[["-ar","— -a -e -emos -ad -en"],["-er","— -e -a -amos -ed -an"],["-ir","— -e -a -amos -id -an"]]});
+Object.assign(FB,{ger:"<p>estar 依人稱變化，後面的現在分詞不變。</p>",imv:"<p>tú 形 = 現在式的 él / ella；vosotros 形 = 原形去掉 r 加 d。</p><p>usted、nosotros、ustedes 借用現在虛擬式；沒有 yo 形。</p><p>例句前的灰色小標籤標示對象：tú、usted、vosotros。</p>"});
+Object.assign(TN,{ger:"描述此刻正在進行的動作；常搭配 ahora、ahora mismo、en este momento。",imv:"用來下指令、給建議或邀請；tú 形等於 él 的現在式，其餘人稱借用虛擬式。"});
+const gc=k=>{const b=bs(k);return GIX[b]||PSC[b]?"gx":b.slice(-2)==="ar"?"ga":/[aeoí]$/.test(b.slice(0,-2))?"gy":"gi"};
+Object.assign(XGS,{ger:{g:[["ga","-ar → -ando","","-ando"],["gi","-er / -ir → -iendo","","-iendo"],["gy","詞幹以母音結尾 → -yendo","","-yendo"],["gx","不規則","詞幹變化或完全不規則。","不規則"]],cls:gc,tag:k=>""},
+imv:{g:[["ma","-ar 規則動詞","","-ar"],["me","-er / -ir 規則動詞","","-er / -ir"],["mx","不規則","","不規則"]],cls:k=>IMVI[bs(k)]?"mx":bs(k).slice(-2)==="ar"?"ma":"me",tag:k=>""}});
+XP.ger={hablar:["Estoy hablando con mi madre.|我正在跟媽媽說話。"],comer:["Estamos comiendo ahora.|我們現在正在吃飯。"],leer:["Está leyendo un libro.|他正在看書。"],dormir:["El bebé está durmiendo.|寶寶正在睡覺。"],hacer:["¿Qué estás haciendo?|你在做什麼？"],llover:["Está lloviendo.|正在下雨。"]};
+XP.imv={hablar:["Habla más despacio, por favor.|請說慢一點。"],comer:["Come la sopa.|把湯喝掉。"],abrir:["Abrid los libros.|請翻開書。"],ser:["Sé amable.|要有禮貌。"],ir:["Ve a casa.|回家去。"],hacer:["Haz la tarea.|做功課。"],tener:["Ten cuidado.|小心。"],venir:["Ven aquí.|過來這裡。"],decir:["Di la verdad.|說實話。"],poner:["Pon la mesa.|擺桌子。"],esperar:["Espere un momento, por favor.|請等一下。"]};
+const A2V=new Set(["acompañar","prometer","permitir","mostrar","caer","divertirse","alquilar","cumplir","ofrecer","compartir","describir","asistir"]);let F2=0;
+const okv=k=>LV===1?!A2V.has(k):(!F2||A2V.has(k));let RL=1;const rokv=k=>RL===1?!A2V.has(k):RL===2?A2V.has(k):true;function syncRL(){document.querySelectorAll('[data-rl]').forEach(x=>x.classList.toggle('on',+x.dataset.rl===RL))}
+$("lbar").insertAdjacentHTML("afterend",'<div class="bar" id="fbar" hidden><button data-f="0">A1+A2</button><button data-f="1">A2</button></div>');
+function applyLv(){$("fbar").hidden=!(LV>1);[...$("fbar").children].forEach(b=>b.classList.toggle("on",+b.dataset.f===F2));
+ document.querySelectorAll(".v").forEach(c=>{const k=c.dataset.k;c.style.display=okv(k)?"":"none";c.classList.toggle("a2",LV>1&&A2V.has(k))});
+ document.querySelectorAll(".card").forEach(cd=>{const vs=[...cd.querySelectorAll(".v")];cd.classList.toggle("fh",vs.length>0&&vs.every(c=>c.style.display==="none"))});
+ $("s9").hidden=(TENSE==="imv"||TENSE==="neg");if((TENSE==="imv"||TENSE==="neg")){const a=$("nav").querySelector('a[href="#s9"]');a&&a.remove()}
+ [...document.querySelectorAll(".card h2 .n")].filter(n=>!n.closest("[hidden],.fh")).forEach((n,i)=>n.textContent=i+1)}
+const dflt=()=>{F2=0};
+["lbar","tbar"].forEach(id=>$(id).addEventListener("click",()=>{dflt();applyLv()}));
+$("fbar").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;F2=+b.dataset.f;applyLv()});
+applyLv();
+
+/* A2 新動詞例句 */
+(function(){const AD={"acompañar": ["Te acompaño a casa.|我陪你回家。", "Ayer acompañé a mi madre al médico.|昨天我陪媽媽去看醫生。", "Hoy he acompañado a mi hermano.|今天我陪了我弟弟。", "De niño acompañaba a mi padre al mercado.|小時候我常陪爸爸去市場。", "Mañana te acompañaré a la estación.|明天我會陪你去車站。", "¿Me acompañarías al cine?|你願意陪我去看電影嗎？", "Estoy acompañando a mi abuela.|我正在陪我奶奶。", "Acompáñame, por favor.|請陪我一起去。"], "prometer": ["Prometo llegar temprano.|我答應早點到。", "Te prometí una sorpresa.|我答應過你一個驚喜。", "Ya he prometido ayudarte.|我已經答應要幫你了。", "Mi padre siempre prometía mucho.|我爸爸以前總是答應很多事。", "Te prometeré no llegar tarde.|我會答應你不再遲到。", "Prometería estudiar más.|我願意保證多讀書。", "Estoy prometiendo algo difícil.|我正在許下一個困難的承諾。", "Prométeme que vendrás.|答應我你會來。"], "permitir": ["El profesor permite usar el diccionario.|老師允許使用字典。", "Mis padres me permitieron salir.|爸媽允許我出去了。", "No me han permitido entrar.|他們沒讓我進去。", "Antes se permitía fumar aquí.|以前這裡可以抽菸。", "Mañana permitirán la entrada.|明天會開放入場。", "¿Me permitiría pasar, por favor?|可以請您讓我過一下嗎？", "No están permitiendo fotos.|目前不允許拍照。", "Permítame presentarme.|請容我自我介紹。"], "mostrar": ["Te muestro mis fotos.|我給你看我的照片。", "Mostré el pasaporte en la entrada.|我在入口出示了護照。", "Hoy he mostrado mi trabajo.|今天我展示了我的作品。", "Mi abuela me mostraba su jardín.|奶奶以前常帶我看她的花園。", "Mañana te mostraré la ciudad.|明天我會帶你看這座城市。", "¿Me mostraría otro modelo?|可以請您給我看別的款式嗎？", "Estoy mostrando las fotos.|我正在給大家看照片。", "Muéstrame tu cuaderno.|給我看你的筆記本。"], "caer": ["Las hojas caen en otoño.|樹葉在秋天掉落。", "Ayer cayó mucha nieve.|昨天下了很多雪。", "Se me ha caído el móvil.|我的手機掉了。", "De niño caía mucho al correr.|我小時候跑步常跌倒。", "Mañana caerá una tormenta.|明天會有一場暴風雨。", "En invierno caería mucha nieve.|冬天大概會下很多雪。", "Está cayendo la nieve.|雪正在落下。", ""], "divertirse": ["Me divierto con mis amigos.|我和朋友玩得開心。", "Me divertí mucho en la fiesta.|我在派對上玩得很開心。", "Me he divertido mucho hoy.|我今天玩得很開心。", "De niño me divertía en el parque.|小時候我在公園玩得很開心。", "Mañana nos divertiremos en la playa.|明天我們會在海邊玩得開心。", "Me divertiría en esa fiesta.|我在那場派對會玩得很開心。", "Me estoy divirtiendo mucho.|我現在玩得很開心。", ""]},T=["pres","pret","perf","impf","fut","cond","ger","imv"];Object.keys(AD).forEach(k=>AD[k].forEach((x,i)=>{if(!x)return;const t=T[i];if(t==="pres")E[k]=[...(E[k]||[]),x];else if(t==="pret")EP[k]=[...(EP[k]||[]),x];else{XP[t]=XP[t]||{};XP[t][k]=[x]}}))})();
+
+/* ===== A2 新動詞例句、否定命令式、條件式用途、肯定命令式 A1 ===== */
+(function(){
+N.forEach(a=>{E[a[0]]=[a[3]+"|"+a[4]];A2V.add(a[0])});
+})();
+/* 補例句：A2 其餘新動詞（條件式、命令式）＋ 由現在式例句自動衍生 perf / ger / impf / fut */
+(function(){
+XP.cond=XP.cond||{};XP.imv=XP.imv||{};
+const C={alquilar:"Alquilaría un piso más grande.|我想租一間大一點的公寓。",cumplir:"Mi abuelo cumpliría cien años hoy.|我爺爺如果還在，今天就一百歲了。",ofrecer:"En tu lugar, le ofrecería ayuda.|如果我是你，我會主動提供幫助。",compartir:"¿Compartirías el piso con un desconocido?|你會跟陌生人合租公寓嗎？",describir:"Describiría mi barrio como tranquilo.|我會形容我住的社區很安靜。",asistir:"Asistiría a la fiesta, pero trabajo.|我很想去參加派對，但我要工作。"},
+M={alquilar:"Alquila un coche en el aeropuerto.|在機場租一輛車。",cumplir:"Cumple tu promesa.|請遵守你的承諾。",ofrecer:"Ofrece un café a tus invitados.|請招待客人喝咖啡。",compartir:"Comparte tu comida con ellos.|和他們分享你的食物。",describir:"Describe tu casa, por favor.|請描述你的家。",asistir:"Asiste a la reunión mañana.|明天要出席會議。"};
+Object.keys(C).forEach(k=>{XP.cond[k]=[C[k]];XP.imv[k]=[M[k]]});
+const SK=new Set("ser estar haber llamarse tener saber querer creer deber parecer costar preferir entender comprender sentir sentirse oír".split(" ")),SG=new Set([...SK,"ir","poder","necesitar"]),
+H=/todos|cada|siempre|\blos (lunes|sábados|domingos)|por la|en verano|al mes|\bhoy\b|ahora/i,
+CF={perf:["Hoy ","我今天已經","了。",SK,H],ger:["","我正在","。",SG,new RegExp(H.source+"|a las|\\bque\\b","i")],impf:["Antes ","我以前","。",null,/\bhoy\b|ahora|mañana/i],fut:["Mañana ","我明天會","。",SK,H],pret:["Ayer ","我昨天","了。",null,H]};
+Object.keys(CF).forEach(t=>{const[ep,zp,ze,sk,rx]=CF[t],S=t==="pret"?EP:(XP[t]=XP[t]||{});
+ Object.keys(GL).forEach(k=>{if(k==="haber"||S[k]||(sk&&sk.has(k)))return;
+  const r=RS.has(k),py=conj(k).f[0],y=CJ[t](k).f[0];let o=null;
+  (E[k]||[]).forEach(q=>{if(o)return;const[es,zh]=q.split("|"),m=es.match(/^(Me )?(\S+) (.*)$/);
+   if(!m||!!m[1]!==r||m[2].toLowerCase()!==py||rx.test(es)||!/^我(?![們的媽爸家弟哥姊妹])/.test(zh)||!zh.endsWith("。"))return;
+   let x=ep+(r&&t!=="ger"?"me ":"")+y+" "+m[3];x=x[0].toUpperCase()+x.slice(1);
+   o=x+"|"+zh.replace(/^我/,zp).replace(/。$/,ze)});
+  if(o)S[k]=[o]})});
+["pret","impf","fut","cond","imv"].forEach(t=>{const x=TS[t];delete TS[t];TS[t]=x});
+renderT();dflt();applyLv();
+})();
+
+(function(){
+const A=(t,o)=>{XP[t]=XP[t]||{};Object.keys(o).forEach(k=>{if(!XP[t][k])XP[t][k]=[o[k]]})};
+A("imv",{mirar:"Mira esta foto.|看這張照片。",escuchar:"Escucha la música.|聽這音樂。",repetir:"Repite, por favor.|請再說一次。",leer:"Lee el texto.|讀這段文字。",escribir:"Escribe tu nombre.|寫下你的名字。",cerrar:"Cierra la puerta.|關門。",beber:"Bebe agua.|喝水。",llamar:"Llama a tu madre.|打電話給你媽媽。",salir:"Sal de aquí.|離開這裡。",seguir:"Sigue todo recto.|一直往前走。",girar:"Gira a la derecha.|向右轉。",cruzar:"Cruza la calle.|過馬路。",coger:"Coge el autobús.|搭公車。",tomar:"Toma la segunda calle.|走第二條街。",pedir:"Pide un café.|點一杯咖啡。",comprar:"Compra pan.|買麵包。",ayudar:"Ayuda a tu hermano.|幫你弟弟。",practicar:"Practica cada día.|每天練習。",estudiar:"Estudia más.|多讀點書。",volver:"Vuelve pronto.|快點回來。",entrar:"Entra, por favor.|請進。",dormir:"Duerme bien.|好好睡。",ver:"Ve esta película.|去看這部電影。",esperar:"Espera aquí.|在這裡等。"});
+A("neg",{hablar:"No hables tan rápido.|不要說得那麼快。",comer:"No comas tanto.|不要吃那麼多。",beber:"No bebas café por la noche.|晚上不要喝咖啡。",escribir:"No escribas aquí.|不要寫在這裡。",abrir:"No abras la ventana.|不要開窗。",ser:"No seas tímido.|別害羞。",ir:"No vayas solo.|不要一個人去。",hacer:"No hagas ruido.|不要吵。",tener:"No tengas miedo.|別害怕。",venir:"No vengas tarde.|不要遲到。",decir:"No digas eso.|別說那種話。",poner:"No pongas eso ahí.|別把那個放在那裡。",dar:"No me des más trabajo.|別再給我更多工作。",estar:"No estés triste.|別難過。",olvidar:"No olvides el paraguas.|別忘了傘。",perder:"No pierdas el tren.|別錯過火車。",llegar:"No llegues tarde.|別遲到。",usar:"No uses el móvil aquí.|別在這裡用手機。",comprar:"No compres eso.|別買那個。",salir:"No salgas sin abrigo.|別沒穿外套就出門。",volver:"No vuelvas tarde.|別太晚回來。",saber:"No sepas nada de esto.|（你）別知道這件事。",pensar:"No pienses tanto.|別想那麼多。",preocupar:"No te preocupes por mí.|別為我擔心。"});
+A("imv",{recoger:"Recoge tus cosas.|收好你的東西。",cortar:"Corta el pan.|把麵包切開。",mezclar:"Mezcla bien los huevos.|把蛋攪拌均勻。",hervir:"Hierve el agua.|把水煮開。",freír:"Fríe las patatas.|炸馬鈴薯。",planchar:"Plancha la camisa.|燙襯衫。",regar:"Riega las plantas.|給植物澆水。",colgar:"Cuelga la ropa.|把衣服晾起來。"});
+A("neg",{cortar:"No cortes el pan tan grueso.|別把麵包切得太厚。",mezclar:"No mezcles los colores.|別把顏色混在一起。",planchar:"No planches la seda con calor fuerte.|別用高溫燙絲綢。",regar:"No riegues las plantas con agua fría.|別用冷水澆植物。",hervir:"No hiervas la leche mucho tiempo.|牛奶別煮太久。",colgar:"No cuelgues la ropa mojada aquí.|別把濕衣服掛在這裡。",freír:"No frías con tanto aceite.|別用那麼多油煎。",recoger:"No recojas eso del suelo.|別去撿地上那個。"});
+delete XP.neg.saber;delete XP.neg.preocupar;
+// 條件式：用途標籤
+const CT={querer:"請求",poder:"請求",tener:"建議",ser:"建議",acompañar:"請求",permitir:"請求",mostrar:"請求",prometer:"假設",caer:"假設",divertirse:"假設",alquilar:"假設",cumplir:"假設",ofrecer:"建議",compartir:"假設",describir:"假設",asistir:"假設"};
+Object.assign(XP.cond,{recoger:["¿Recogerías a los niños en la escuela?|可以請你去學校接孩子嗎？|請求"],cortar:["Yo cortaría las verduras más finas.|我會把蔬菜切得更細一點。|建議"],mezclar:["Yo mezclaría los ingredientes con calma.|我會慢慢地把材料拌在一起。|建議"],hervir:["Herviría agua para el té, pero no hay gas.|我想燒水泡茶，可是沒有瓦斯。|假設"],freír:["Si tuviera aceite, freiría unas patatas.|如果有油，我就炸一些馬鈴薯。|假設"],planchar:["¿Plancharías mi camisa, por favor?|可以請你幫我燙襯衫嗎？|請求"],regar:["Yo regaría las plantas por la mañana.|我會在早上給植物澆水。|建議"],colgar:["¿Colgarías la ropa en el balcón?|可以請你把衣服晾在陽台嗎？|請求"]});
+Object.keys(CT).forEach(k=>{if(XP.cond[k])XP.cond[k]=XP.cond[k].map(x=>x.split("|").length>2?x:x+"|"+CT[k])});
+const CC={gustar:"Me gustaría un café, por favor.|我想要一杯咖啡，麻煩了。|請求",hablar:"¿Hablarías más despacio, por favor?|可以請你說慢一點嗎？|請求",abrir:"¿Abrirías la ventana, por favor?|可以請你開一下窗戶嗎？|請求",ayudar:"¿Me ayudarías con la maleta?|你可以幫我拿行李嗎？|請求",esperar:"¿Esperarías un momento?|可以請你等一下嗎？|請求",decir:"¿Me dirías tu nombre?|你可以告訴我你的名字嗎？|請求",dar:"¿Me darías tu número?|你可以給我你的電話號碼嗎？|請求",venir:"¿Vendrías conmigo?|你願意跟我一起來嗎？|請求",deber:"Deberías descansar más.|你應該多休息。|建議",hacer:"En tu lugar, haría ejercicio.|如果我是你，我會運動。|建議",ir:"Yo iría en tren.|我會搭火車去。|建議",salir:"Yo saldría más temprano.|我會早點出門。|建議",comer:"En tu lugar, comería menos azúcar.|如果我是你，我會少吃點糖。|建議",estudiar:"Yo estudiaría más.|我會多讀點書。|建議",dormir:"En tu lugar, dormiría más.|如果我是你，我會多睡一點。|建議",beber:"Bebería menos café.|我會少喝點咖啡。|建議",llamar:"Yo llamaría a un médico.|我會打給醫生。|建議",vivir:"Viviría en el campo.|我會想住在鄉下。|假設",viajar:"Viajaría por todo el mundo.|我會環遊世界。|假設",trabajar:"No trabajaría los fines de semana.|我不會在週末工作。|假設",comprar:"Compraría una casa grande.|我會買一間大房子。|假設",saber:"Sabría cocinar mejor.|我會煮得更好。|假設"};
+Object.keys(CC).forEach(k=>{if(!XP.cond[k])XP.cond[k]=[CC[k]]});
+// 否定命令式
+Object.assign(TS,{neg:{zh:"否定命令式",es:"imperativo negativo",lv:2}});
+const NI=new Set("ser ir saber dar estar".split(" "));
+CJ.neg=k=>{const b=bs(k),q=conjIm(k).f;let f=["",q[2]+"s",q[2],q[3],q[3].replace(/amos$/,"áis").replace(/emos$/,"éis"),q[5]];if(b==="dar"){f[1]="des";f[4]="deis"}f=f.map(x=>x&&"no "+x);return{f,reg:NI.has(b)?f.map(x=>x&&x+"~"):f.slice(),r:0}};
+FT.neg=[["no + -ar","— -es -e -emos -éis -en"],["no + -er / -ir","— -as -a -amos -áis -an"]];
+FB.neg="<p>否定命令式 = no + 現在虛擬式，各人稱都用虛擬式（沒有 yo 形）。</p><p>-ar 改用 -e 系列，-er / -ir 改用 -a 系列。</p><p>例句前的灰色小標籤標示對象：tú、usted、vosotros。</p>";
+TN.neg="用來禁止或勸阻，例如 No te preocupes。";
+XGS.neg={g:[["na","-ar 規則動詞","","-ar"],["ne","-er / -ir 規則動詞","","-er / -ir"],["nx","不規則","ser、ir、saber、dar、estar","不規則"]],cls:k=>NI.has(bs(k))?"nx":bs(k).slice(-2)==="ar"?"na":"ne",tag:k=>""};
+// 肯定命令式 A1：tú 優先
+TN.imv="用來下指令、給建議或邀請。A1 先掌握 tú 形（ven、mira、escucha…）。";
+FB.cond="<p>三種常見用途：</p><p>① 請求：¿Podrías…?、Querría…、Me gustaría…</p><p>② 建議：Yo en tu lugar + 條件式、Deberías…</p><p>③ 假設：想像不一定會發生的情況，例如 Viviría en el campo.</p><p>詞幹與未來式相同，字尾是 -ía 系列。</p>";
+TN.cond="用於禮貌請求、給建議與說假設。";
+TN.perf="描述與現在仍有關聯的經驗或剛發生的事；常搭配 hoy、esta semana、ya、nunca。";
+const o={...TS},ord=["pres","ger","imv","perf","pret","impf","fut","cond","neg"];ord.forEach(t=>delete TS[t]);ord.forEach(t=>TS[t]=o[t]);
+renderT();dflt();applyLv();
+})();
+/* ===== 手動潤飾：新增 A2 動詞的各時態例句（取代機械套句）===== */
+(function(){
+SC.doler="o→ue";
+const PT=`hablar|con mi vecina|和鄰居聊{了}幾句
+trabajar|en una oficina|在辦公室工作{了}
+estudiar|inglés|學{了}英文
+comprar|una camisa|買{了}一件襯衫|i
+necesitar|ayuda|需要幫忙|gvN
+escuchar|música|聽{了}音樂
+tomar|un café|喝{了}一杯咖啡
+tomar#1|el autobús|搭{了}公車
+desayunar|pan con tomate|吃{了}番茄麵包當早餐
+cenar|en casa|在家吃{了}晚餐
+bailar|en la fiesta|在派對上跳{了}舞
+cantar|en la ducha|在淋浴時唱{了}歌
+viajar|a Italia|去{了}義大利旅行
+caminar|al trabajo|走路去上班{了}
+mirar|la tele|看{了}電視
+preguntar|el precio|問{了}價錢
+contestar|el teléfono|接{了}電話
+esperar|a mi amigo|等{了}我的朋友
+esperar#1|una buena noticia|盼望{了}一個好消息|N
+ayudar|a mi madre|幫{了}媽媽的忙
+entrar|en la tienda|走進{了}商店
+llegar|a casa|到{了}家|gv
+terminar|el informe|完成{了}報告
+usar|el ordenador|用{了}電腦
+visitar|el museo|參觀{了}博物館
+cocinar|la cena|煮{了}晚餐
+pagar|la cuenta|付{了}帳
+buscar|las llaves|找{了}鑰匙
+practicar|español|練習{了}西班牙文
+llamar|a mi hermana|給妹妹打{了}電話
+llamar#1|al camarero|叫{了}服務生過來
+nadar|en la piscina|在游泳池游泳{了}
+lavar|el coche|洗{了}車
+alquilar|un piso|租{了}一間公寓|i
+olvidar|el paraguas|忘記{了}雨傘|gc
+preparar|la cena|準備{了}晚餐
+invitar|a mis amigos|邀請{了}我的朋友
+enseñar|español a los niños|教{了}孩子們西班牙文
+enseñar#1|mis fotos a mi madre|給媽媽看{了}我的照片
+tocar|la guitarra|彈{了}吉他
+tocar#1|la pared|摸{了}牆|c
+ganar|el partido|贏{了}比賽|g
+ganar#1|mucho dinero|賺{了}很多錢
+pasar|el fin de semana|度過{了}週末
+pasar#1|por el parque|經過{了}公園
+celebrar|mi cumpleaños|慶祝{了}我的生日
+limpiar|la cocina|打掃{了}廚房
+llevar|un paraguas|帶{了}一把傘
+llevar#1|una chaqueta azul|穿{了}一件藍色外套
+quedar|con mis amigos|和朋友約{了}見面
+cambiar|dinero|換{了}錢
+cambiar#1|de opinión|改變{了}想法
+pasear|con mi perro|和我的狗散{了}步
+reservar|una mesa para dos|預訂{了}兩人的桌位
+regalar|flores a mi madre|送{了}花給媽媽
+bajar|del autobús|下{了}公車
+girar|a la derecha|向右轉{了}
+cruzar|la calle|過{了}馬路
+acompañar|a mi abuela al médico|陪奶奶去看醫生{了}
+acabar|la reunión|結束{了}會議
+acabar#1|el trabajo|把工作做完{了}
+aceptar|la invitación de mi amigo|接受{了}我朋友的邀請|i
+apagar|la luz|把燈關掉{了}
+arreglar|la bicicleta de mi hermano|修{了}我哥哥的腳踏車
+arreglar#1|mi escritorio|整理{了}我的書桌
+avisar|a mi jefe|通知{了}我的老闆
+cargar|el móvil|給手機充{了}電
+cargar#1|las cajas|搬{了}箱子
+comentar|la película|評論{了}這部電影
+comentar#1|la noticia con mi madre|和媽媽聊起{了}這則新聞
+cuidar|a mi hermano pequeño|照顧{了}我的小弟弟
+dejar|a mi hermano usar mi móvil|讓我哥哥用{了}我的手機
+dejar#1|las llaves en la mesa|把鑰匙留在桌上{了}
+descansar|un rato|休息{了}一會兒
+disfrutar|de la música|好好享受{了}音樂
+entregar|el informe al jefe|把報告交給主管{了}
+explicar|la lección a los alumnos|向學生講解{了}這一課
+gastar|mucho dinero en ropa|花{了}很多錢買衣服
+gritar|de alegría|開心地大叫{了}
+guardar|el archivo|保存{了}檔案
+guardar#1|los documentos en una carpeta|把文件收進資料夾{了}
+lograr|aprobar el examen|成功通過{了}考試|gvN
+mandar|una carta a mi abuela|寄{了}一封信給奶奶
+mandar#1|un mensaje a mi hermano|傳{了}訊息給我哥哥
+parar|el coche delante de la casa|把車停在家門口{了}
+perdonar|a mi amigo|原諒{了}我的朋友|giN
+quitar|los platos de la mesa|把桌上的盤子收走{了}
+saludar|a los vecinos|跟鄰居打{了}招呼
+sacar|el móvil del bolso|從包包裡拿出{了}手機
+sacar#1|una buena nota|拿{了}好成績|g
+tardar|una hora en llegar|花{了}一個小時才到|gvN
+tirar|la basura|倒{了}垃圾
+tratar|de dormir más|試著多睡一點|N
+utilizar|el diccionario|用{了}字典
+votar|en las elecciones|在選舉中投{了}票
+imaginar|mi futuro|想像{了}我的未來|N
+ordenar|mi habitación|整理{了}我的房間
+ordenar#1|a los niños callarse|命令{了}孩子們安靜
+ahorrar|dinero para el viaje|為旅行存{了}錢
+aparcar|el coche cerca de casa|把車停在家附近{了}
+dibujar|un gato|畫{了}一隻貓|i
+mejorar|mi pronunciación|改善{了}我的發音|i
+mejorar#1|con el tiempo|隨著時間進步{了}|v
+organizar|una fiesta para mi amiga|為朋友籌辦{了}一場派對
+organizar#1|mi agenda|安排{了}我的行程
+pintar|la pared de blanco|把牆漆成白色{了}
+pintar#1|un paisaje|畫{了}一幅風景畫|i
+llenar|el depósito de gasolina|把油箱加滿{了}
+apuntar|la dirección en el cuaderno|把地址記在筆記本上{了}
+fumar|un cigarrillo|抽{了}一根菸
+comer|arroz|吃{了}米飯
+beber|un vaso de agua|喝{了}一杯水
+leer|el periódico|看{了}報紙
+vender|frutas|賣{了}水果
+aprender|palabras nuevas|學{了}一些新單字
+correr|cinco kilómetros|跑{了}五公里
+comprender|el problema|理解{了}這個問題|Ni
+responder|al correo|回覆{了}郵件
+creer|a mi madre|相信{了}我媽媽|gN
+creer#1|lo mismo|有同樣的看法|gvN
+deber|estudiar más|應該多讀書|gvfuipcN
+prometer|ayudar a mi hermano|答應{了}幫我哥哥的忙
+prometer#1|lealtad a la empresa|對公司承諾{了}忠誠
+romper|un vaso|打破{了}一個杯子|vi
+romper#1|el ordenador|弄壞{了}電腦|vi
+temer|perder el vuelo|擔心會錯過班機|gvN
+meter|la ropa en la maleta|把衣服放進行李箱{了}
+esconder|el regalo|把禮物藏起來{了}
+barrer|el suelo|掃{了}地
+vivir|cerca del centro|住在市中心附近|d
+vivir#1|con calma|過著從容的生活|d
+escribir|un correo|寫{了}一封郵件
+abrir|la ventana|把窗戶打開{了}
+recibir|una carta|收到{了}一封信|g
+decidir|comprar un coche|決定買車{了}
+subir|al tercer piso|上到三樓{了}
+partir|temprano|很早出發{了}|g
+compartir|el piso con un amigo|和朋友合租{了}公寓
+asistir|a la reunión|出席{了}會議
+describir|el problema|描述{了}這個問題
+cumplir|veinte años|滿{了}二十歲|givcf
+permitir|usar el móvil|允許{了}使用手機
+sufrir|dolor de cabeza|受頭痛所苦|vcN
+sufrir#1|el calor|忍受{了}炎熱|vcN
+discutir|el plan con mi equipo|和團隊討論{了}計畫
+discutir#1|con mi hermano|和哥哥吵{了}一架
+insistir|en pagar|堅持要付錢|N
+dividir|el pastel en ocho partes|把蛋糕切成八份{了}
+añadir|sal a la sopa|往湯裡加{了}鹽
+imprimir|el documento|把文件印出來{了}
+aplaudir|al cantante|為歌手鼓{了}掌
+querer|un café|想要一杯咖啡|gvN
+querer#1|a mi familia|愛我的家人|pfgvuc
+empezar|a trabajar|開始工作{了}
+pensar|en el viaje|考慮{了}這次旅行
+pensar#1|lo mismo|有同樣的想法|gvN
+preferir|el té|比較想要茶|gpN
+entender|la lección|聽懂{了}這一課|Ni
+cerrar|la puerta|把門關上{了}
+perder|las llaves|弄丟{了}鑰匙
+perder#1|el partido|輸{了}比賽
+sentir|frío|覺得很冷|gvN
+poder|terminar el trabajo|能夠完成工作|gv
+volver|a casa|回{了}家
+dormir|ocho horas|睡{了}八個小時|g
+encontrar|mis gafas|找到{了}我的眼鏡|gv
+recordar|el nombre de mi vecino|記得我鄰居的名字|gpN
+almorzar|con mis compañeros|和同事吃{了}午餐
+jugar|con mis amigos|和朋友玩{了}一會兒
+jugar#1|un partido de fútbol|踢{了}一場足球賽
+pedir|un café|點{了}一杯咖啡
+pedir#1|ayuda|請求{了}幫助
+seguir|estudiando español|繼續學西班牙文|g
+seguir#1|a mi guía|跟著{了}我的導遊
+repetir|la pregunta|重複{了}這個問題
+servir|la cena a los invitados|為客人上{了}菜
+contar|hasta diez|數到{了}十
+contar#1|una historia|講{了}一個故事
+comenzar|a estudiar|開始讀書{了}
+mostrar|mis fotos a mi madre|給媽媽看{了}我的照片
+mostrar#1|el pasaporte|出示{了}護照
+recomendar|esta película a mis amigos|向朋友推薦{了}這部電影
+probar|la camisa|試穿{了}這件襯衫
+probar#1|la sopa|嚐{了}一口湯
+mover|la mesa|把桌子挪開{了}
+volar|a Madrid|飛到馬德里{了}
+soñar|con ser médico|夢想當醫生|pfgvN
+soñar#1|con mi abuela|夢見{了}我的奶奶|vN
+encender|la luz|把燈打開{了}
+mentir|a mi madre|對媽媽說{了}謊
+sugerir|otra idea|提出{了}另一個想法
+resolver|el problema|解決{了}這個問題
+devolver|el libro a la biblioteca|把書還給圖書館{了}
+atender|a los clientes|接待{了}客人
+atender#1|a mi abuela|照料{了}我的奶奶
+defender|mi opinión|捍衛{了}我的意見
+defender#1|a mi hermano|保護{了}我的弟弟
+hacer|la compra|採買{了}日用品
+poner|la mesa|擺{了}餐桌
+salir|de casa|出{了}門
+salir#1|del trabajo|離開{了}公司
+traer|el postre|帶{了}甜點來
+conocer|a mis vecinos|認識{了}我的鄰居|gN
+saber|la respuesta|知道答案|gvfN
+saber#1|nadar|會游泳|pfiugvc
+ver|una película|看{了}一部電影
+dar|un paseo|散{了}個步
+venir|a mi casa|來{了}我家
+tener|un perro|有一隻狗|gv
+decir|la verdad|說{了}實話
+oír|un ruido extraño|聽到{了}一個奇怪的聲音|gvc
+ofrecer|un café a mi vecino|請鄰居喝{了}一杯咖啡
+coger|un libro|拿{了}一本書
+coger#1|el autobús|搭{了}公車
+caer|al suelo|掉到地上{了}|vc
+caer#1|en la calle|在街上跌倒{了}|vc
+conducir|un coche pequeño|開{了}一輛小車
+traducir|el texto al inglés|把文章翻成英文{了}
+reconocer|la voz de mi madre|認出{了}我媽媽的聲音|gN
+agradecer|la ayuda de mis vecinos|感謝{了}鄰居的幫忙|gv
+ser|amable con todos|對大家親切|g
+estar|en casa|在家|g
+estar#1|de buen humor|心情很好|gv
+ir|al mercado|去{了}市場
+llamarse|Pablo|叫 Pablo|pfiugvc
+levantarse|a las siete|七點起床{了}|g
+ducharse|por la mañana|在早上淋{了}浴|g
+acostarse|tarde|很晚上床睡覺{了}|g
+despertarse|con el despertador|被鬧鐘叫醒{了}|g
+vestirse|con ropa deportiva|穿上運動服{了}
+sentarse|en el sofá|坐在沙發上{了}
+ponerse|el abrigo|穿上{了}外套
+lavarse|las manos|洗{了}手
+bañarse|con agua caliente|用熱水洗{了}澡
+peinarse|antes de salir|出門前梳{了}頭
+afeitarse|con cuidado|小心地刮{了}鬍子
+quedarse|en casa|留在家裡{了}
+quedarse#1|en la cama|待在床上{了}
+sentirse|mejor|覺得好多了|gN
+divertirse|en la fiesta|在派對上玩得很開心|N
+casarse|en una iglesia pequeña|在小教堂結婚{了}|gi
+preocuparse|por mi madre|很擔心我媽媽|N
+quejarse|del ruido|抱怨{了}噪音
+aburrirse|en clase|在課堂上覺得無聊|gN
+enfadarse|con mi hermano|和哥哥生{了}氣|N
+acordarse|de mi cumpleaños|想起{了}我的生日|gN`;
+const AV={pres:[["Todos los días","每天","todos los días"],["Normalmente","通常","normalmente"],["Siempre","總是","siempre"]],pret:[["Ayer","昨天","ayer"],["Anoche","昨晚","anoche"],["El lunes","星期一","el lunes"],["La semana pasada","上星期","la semana pasada"]],perf:[["Hoy","今天","hoy"],["Esta semana","這個星期","esta semana"],["Esta mañana","今天早上","esta mañana"]],impf:[["Antes","以前","antes"],["Hace años","幾年前","hace años"]],fut:[["Mañana","明天","mañana"],["El sábado","星期六","el sábado"],["La próxima semana","下個星期","la próxima semana"]],ger:[["Ahora","現在","ahora"],["Ahora mismo","此刻","ahora mismo"]]};
+const FN={pres:conj,pret:conjI,perf:conjP,impf:conjM,fut:CJ.fut,ger:CJ.ger},T2={p:"pret",f:"perf",i:"impf",u:"fut",g:"ger"};
+const S0=t=>t==="pret"?EP:(XP[t]=XP[t]||{});
+const cap=x=>x[0].toUpperCase()+x.slice(1),SKI=new Set("temer sufrir soñar reconocer agradecer perdonar gritar tardar lograr mejorar acordarse preocuparse aburrirse".split(" ")),SKM=new Set("mentir romper fumar volar".split(" "));
+const TLS=["pres","pret","perf","impf","fut","ger","imv","neg","cond"],FL={pres:"s",pret:"p",perf:"f",impf:"i",fut:"u",ger:"g",imv:"v",neg:"v",cond:"c"},TI={pres:0,pret:1,perf:2,impf:3,fut:4,ger:5};
+const NEGOK=new Set("abrir cerrar apagar encender usar tocar mover romper tirar gastar fumar gritar mentir olvidar perder dejar quitar esconder entrar salir ir venir parar aparcar cruzar bajar subir comprar vender pagar llamar mandar decir contestar esperar invitar guardar hablar correr nadar leer escribir mirar escuchar hacer poner coger tomar beber comer llevar traer sacar entregar avisar saludar apuntar cambiar cargar reservar regalar preparar cocinar lavar limpiar barrer pintar dibujar imprimir añadir dividir meter devolver enseñar mostrar ofrecer prometer atender conducir traducir probar ver dar volar organizar ayudar arreglar utilizar ordenar llenar aceptar visitar buscar alquilar celebrar girar caminar viajar desayunar cenar preguntar asistir compartir decidir empezar comenzar terminar discutir resolver repetir pedir jugar contar almorzar recibir describir permitir insistir aplaudir sugerir recomendar acabar responder explicar votar acompañar pasear".split(" "));
+const SX=t=>t==="pres"?E:S0(t),MN=k=>(GL[k]||"").split("；");
+const PTM={};PT.split("\n").forEach(l=>{const[kk,o,z,fl=""]=l.split("|"),[k,m="0"]=kk.split("#");(PTM[k]=PTM[k]||[])[+m]={o,z,fl}});
+const SJ=[{i:0,es:"",zh:"我",p:"mi",pz:"我"},{i:2,es:"Ana",zh:"Ana ",p:"su",pz:"她"},{i:3,es:"",zh:"我們",p:"",pz:"我們"},{i:5,es:"los vecinos",zh:"鄰居們",p:"",pz:"他們"},{i:2,es:"Carlos",zh:"Carlos ",p:"su",pz:"他"}],TU={i:1,es:"",zh:"你",p:"tu",pz:"你"};
+const MIP=/(^|[^\p{L}])(mis?)(?![\p{L}])/giu,HASM=/(^|[^\p{L}])mis?(?![\p{L}])/iu,PXP=["me","te","se","nos","os","se"];
+const adapt=(S,o,z)=>S.p==="mi"?[o,z]:[o.replace(MIP,(m,a,w)=>a+S.p+(w==="mis"?"s":"")),z.replace(/我/g,S.pz)];
+const pick=(n,o)=>{const L=SJ.filter(S=>S.p||!HASM.test(o));return L[n%L.length]};
+const J=(...a)=>a.filter(Boolean).join(" "),cp2=x=>x?x[0].toUpperCase()+x.slice(1):x;
+const AVD={pres:AV.pres,pret:[["El año pasado","去年","el año pasado"],["Hace años","幾年前","hace años"]],perf:[["Este año","今年","este año"],["Últimamente","最近","últimamente"]],impf:[["Antes","以前","antes"],["Hace años","幾年前","hace años"]],fut:[["El año que viene","明年","el año que viene"],["Pronto","不久之後","pronto"]],ger:[["Ahora","現在","ahora"],["Este mes","這個月","este mes"]]};
+function mkS(t,k,p,n,cnt){
+ const o=p.o,z=p.z,r=RS.has(k),F=FN[t](k).f,ti=TI[t],tab=(p.fl.includes("d")?AVD:AV)[t],[T0,Tz,t2]=tab[n%tab.length];
+ const W={pres:"",pret:"",perf:"",impf:"常",fut:"會",ger:z.startsWith("在")?"正":"正在"}[t],Wn=z.startsWith("有")&&(t==="pres"||t==="pret"||t==="perf")?"沒":{pres:"不",pret:"沒有",perf:"沒有",impf:"不常",fut:"不會"}[t],l=t==="pret"||t==="perf"?"了":"";
+ const mk=(S,kd)=>{const[o2,z2]=adapt(S,o,z),v=(r&&t!=="ger"?PXP[S.i]+" ":"")+F[S.i],zp=z2.replace("{了}",l),zn=z2.replace("{了}","");let es,zh;
+  if(kd==="A"){es=J(T0,S.es,v,o2)+".";zh=S.zh+Tz+W+zp+"。"}
+  else if(kd==="B"){es=cp2(J(S.es,v,o2,t2))+".";zh=S.zh+Tz+W+zp+"。"}
+  else if(kd==="B2"){es=cp2(J(S.es,"siempre",v,o2))+".";zh=S.zh+"以前總是"+zp+"。"}
+  else if(kd==="C"){es="¿"+cp2(J(v,o2,t2))+"?";zh="你"+Tz+W+zp+"嗎？"}
+  else{es=cp2(J(S.es,"no",v,o2,t2))+".";zh=S.zh+Tz+Wn+zn+"。"}
+  return es+"|"+zh};
+ const nD=p.fl.includes("N"),K=t==="impf"?["A","B2","C"]:t==="ger"?["A","B","C"]:nD?["A","B","C"]:["A","B","C","D"],L1=t==="impf"?["A","B2"]:["A","B"],L2=t==="ger"||t==="impf"||nD?["C"]:["C","D"];
+ const ks=cnt===1?[K[n%K.length]]:[L1[n%2],L2[(n>>1)%L2.length]];
+ return ks.map((kd,j)=>mk(kd==="C"?TU:pick(n+ti+(j?3:0),o),kd))}
+const UO=[["Por favor,","請"],["Profesor,","老師，請您"],["Disculpe,","不好意思，請您"],["Señora,","女士，請您"],["Oiga,","先生，請您"],["Perdone,","抱歉，請您"]],VO=[["Chicos,","各位，"],["Niños,","小朋友們，"],["Chicas,","各位，"],["Venga, chicos,","大家，"]];
+function mkG(t,k,p,n,cnt){
+ const o=p.o,z=p.z,r=RS.has(k),zz=z.replace("{了}",""),A=(k.length+n)%2;let a,b;
+ if(t==="imv"||t==="neg"){if(r||(t==="neg"&&!NEGOK.has(k)))return[];const f=(t==="imv"?conjIm(k):CJ.neg(k)).f;if(!f[1]||!f[2]||!f[4])return[];
+  {const ng=t==="neg"?"不要":"",u=UO[(n+k.length)%UO.length],v=VO[(n+k.length)%VO.length];a="[tú] "+cap(f[1])+" "+o+".|"+ng+zz+"。";b=A?"[usted] "+u[0]+" "+f[2]+" "+o+".|"+u[1]+ng+zz+"。":"[vosotros] "+v[0]+" "+f[4]+" "+o+".|"+v[1]+ng+zz+"。"}}
+
+ else{const f=CJ.cond(k).f,q=r?"me ":"",[o2,z2]=adapt(SJ[1],o,z),[oa,za]=adapt(TU,o,z),zq=z2.replace("{了}","");a="En tu lugar, "+q+f[0]+" "+oa+".|如果我是你，我會"+za.replace("{了}","")+"。";b=A?"Si tuviera tiempo, "+q+f[0]+" "+o+".|如果有時間，我會"+zz+"。":"Ana "+(r?"se ":"")+f[2]+" "+o2+" si pudiera.|如果可以的話，Ana 會"+zq+"。"}
+ return cnt===1?[A?a:b]:[a,b]}
+const MAN={deber:{cond:["Deberías estudiar más.|你應該多讀書。"],impf:["Antes debía estudiar más.|我以前得多讀書。"],fut:["Mañana deberé estudiar más.|明天我得多讀書。"]},parecer:{perf:["La película me ha parecido interesante.|這部電影我覺得很有趣。"],impf:["La película parecía muy larga.|這部電影看起來很長。"],fut:["La película parecerá interesante.|這部電影看起來會很有趣。"],cond:["Esa idea parecería extraña.|這個想法看起來會很奇怪。"]},
+costar:{perf:["El libro ha costado veinte euros.|這本書花了二十歐元。"],impf:["El libro costaba veinte euros.|這本書以前要二十歐元。"],fut:["El libro costará veinte euros.|這本書要二十歐元。"],cond:["El libro costaría veinte euros.|這本書大概要二十歐元。"]},
+llover:{perf:["Hoy ha llovido mucho.|今天下了很多雨。"],impf:["Antes llovía mucho aquí.|以前這裡常下大雨。"],fut:["Mañana lloverá mucho.|明天會下大雨。"]}};
+const MANM={servir:{pres:["Este cable sirve para cargar el móvil.|這條線可以用來幫手機充電。"],pret:["Este cable sirvió para cargar el móvil.|這條線拿來幫手機充了電。"],perf:["Este cable ha servido para cargar el móvil.|這條線已經用來幫手機充過電了。"],impf:["Este cable servía para cargar el móvil.|這條線以前可以用來幫手機充電。"],fut:["Este cable servirá para cargar el móvil.|這條線可以用來幫手機充電。"],ger:["Este cable está sirviendo para cargar el móvil.|這條線現在正用來幫手機充電。"],cond:["Este cable serviría para cargar el móvil.|這條線應該可以用來幫手機充電。"]}};
+function RUN(){
+ let _c=0;const NEWB=new Set("recoger cortar mezclar hervir freír planchar regar colgar".split(" "));
+  Object.keys(GL).forEach((k,n0)=>{const n=NEWB.has(k)?900+n0:_c++;
+  if(k==="haber")return;
+  const MM=MN(k),multi=MM.length>1,ph=PTM[k]||[];
+  TLS.forEach(t=>{
+   const S=SX(t),old=(S[k]||[]).map(x=>(a=>a.slice(0,["請求","建議","假設"].includes(a[2])?3:2).join("|"))(x.split("|")).replace(/正在在/g,"正在")),gen=(p,nn,c)=>(t==="imv"||t==="neg"||t==="cond"?mkG:mkS)(t,k,p,nn,c);
+   if(!multi){
+    if(old.length){S[k]=old;return}
+    const p=ph[0];if(p&&!p.fl.includes(FL[t])){const g=gen(p,n,2);if(g.length)S[k]=g}
+    return}
+   const aligned=(t==="pres"||t==="pret")&&old.length===MM.length,out=[];
+   MM.forEach((_,m)=>{
+    if(aligned){out.push(old[m]+"|"+m);return}
+    const p=ph[m];
+    if(p){if(!p.fl.includes(FL[t]))gen(p,n+m,1).forEach(x=>out.push(x+"|"+m))}
+    else if(MANM[k]&&MANM[k][t])MANM[k][t].forEach(x=>out.push(x+"|"+m))});
+   if(out.length)S[k]=out;else delete S[k]})});
+ Object.keys(MAN).forEach(k=>Object.keys(MAN[k]).forEach(t=>{const S=SX(t);if(!S[k]||!S[k].length)S[k]=MAN[k][t]}))}
+const DI2={impf:{vivir:"De niño vivía en el campo.|我小時候住在鄉下。"},fut:{vivir:"El año que viene viviré en Madrid.|明年我會住在馬德里。"},ger:{vivir:"Estoy viviendo con mi tío este mes.|這個月我暫時和叔叔住在一起。"}};
+Object.keys(DI2).forEach(t=>Object.assign(S0(t),{vivir:[DI2[t].vivir]}));
+const DI={pret:"La planta murió en invierno.|那盆植物在冬天枯死了。",perf:"Mi planta ha muerto.|我的植物死掉了。",impf:"Las plantas morían por el frío.|植物以前常因為寒冷而枯死。",fut:"Sin agua, la planta morirá.|沒有水，這盆植物會死掉。",ger:"La planta se está muriendo.|那盆植物快要死了。"};
+Object.keys(DI).forEach(t=>S0(t).morir=[DI[t]]);
+RUN();
+/* ===== 各時態常用片語與時間標記 ===== */
+const PH={
+pres:`tener que + 原形|必須|Tengo que estudiar hoy.|我今天得讀書。
+hay que + 原形|必須（泛指）|Hay que llegar temprano.|大家得早點到。
+ir a + 原形|打算、即將|Voy a viajar en julio.|我七月要去旅行。
+acabar de + 原形|剛剛|Acabo de llegar.|我剛到。
+volver a + 原形|再一次|Vuelvo a llamar mañana.|我明天再打一次電話。
+soler + 原形|通常|Suelo cenar a las nueve.|我通常九點吃晚餐。`,
+ger:`estar + 現在分詞|正在|Estoy estudiando ahora.|我現在正在讀書。
+seguir + 現在分詞|仍然、還在|Sigo trabajando.|我還在工作。
+llevar + 時間 + 現在分詞|已經…多久|Llevo dos años estudiando español.|我學西班牙文兩年了。
+ir + 現在分詞|漸漸地|Voy aprendiendo poco a poco.|我慢慢地學會。
+ahora mismo / en este momento|此刻|En este momento estoy comiendo.|我此刻正在吃飯。`,
+imv:`por favor|請|Pasa, por favor.|請進。
+ten cuidado|小心|Ten cuidado con el coche.|小心車子。
+dime / dame|告訴我／給我|Dime tu nombre.|告訴我你的名字。
+espera un momento|等一下|Espera un momento, por favor.|請等一下。
+vamos a + 原形|我們一起…吧|Vamos a comer.|我們去吃飯吧。`,
+perf:`hoy / esta semana / este mes|今天／這週／這個月|Esta semana he trabajado mucho.|我這個星期工作很多。
+ya|已經|Ya he comido.|我已經吃過了。
+todavía no|還沒|Todavía no he llegado.|我還沒到。
+alguna vez|曾經（問句）|¿Has estado alguna vez en España?|你去過西班牙嗎？
+nunca / jamás|從來沒有|Nunca he probado el sushi.|我從來沒吃過壽司。`,
+pret:`ayer / anoche|昨天／昨晚|Anoche dormí mal.|我昨晚沒睡好。
+el año pasado / la semana pasada|去年／上星期|El año pasado viajé a Japón.|我去年去了日本。
+hace + 時間|…以前|Llegué hace una hora.|我一個小時前到的。
+de repente|突然|De repente sonó el teléfono.|電話突然響了。
+primero / luego / al final|依序敘事|Primero cené y luego vi la tele.|我先吃晚餐，然後看電視。`,
+impf:`de niño / de niña|小時候|De niño jugaba al fútbol.|我小時候踢足球。
+antes|以前|Antes vivía en el campo.|我以前住在鄉下。
+siempre / todos los días|總是／每天|Siempre comíamos juntos.|我們以前總是一起吃飯。
+era / estaba（背景描述）|那時…|Era tarde y hacía frío.|那時很晚，天氣很冷。
+mientras|當…的時候|Leía mientras viajaba en tren.|我搭火車時看書。`,
+fut:`mañana / pasado mañana|明天／後天|Mañana tendré tiempo.|我明天會有空。
+la semana que viene / el año que viene|下週／明年|El año que viene viajaré a Japón.|明年我會去日本旅行。
+dentro de + 時間|…之後|Llegaré dentro de una hora.|我一個小時後到。
+probablemente / seguro que|大概／一定|Probablemente lloverá.|大概會下雨。`,
+cond:`¿Podría + 原形…?|可以請你…嗎？|¿Podría abrir la ventana, por favor?|可以請你開一下窗戶嗎？
+me gustaría + 原形|我想要…|Me gustaría viajar a España.|我想去西班牙旅行。
+yo en tu lugar + 條件式|如果我是你|Yo en tu lugar estudiaría más.|如果我是你，我會多讀書。
+deberías + 原形|你應該|Deberías descansar un poco.|你應該休息一下。`,
+neg:`no te preocupes|別擔心|No te preocupes por mí.|別擔心我。
+no te olvides de…|別忘了|No te olvides del paraguas.|別忘了雨傘。
+no tengas miedo|別害怕|No tengas miedo, es fácil.|別害怕，很簡單。
+no hables tan alto|別那麼大聲|No hables tan alto aquí.|在這裡別講那麼大聲。`};
+$("s9").insertAdjacentHTML("afterend",'<details class="card" id="ph" hidden></details>');
+function renderPH(){const a=PH[TENSE],c=$("ph");c.hidden=!a;if(!a)return;const o=c.open;
+ c.innerHTML="<summary>常用片語</summary>"+a.split("\n").map(x=>{const[p,z,e,q]=x.split("|");return`<p class="pr"><b class="sp" data-s="${spk(p)}">${p}</b> ${z}<br><span class="es">${e}<span class="sp" data-s="${e}">🔊</span></span> <span class="zh">${q}</span></p>`}).join("");c.open=o}
+const rF=renderF;renderF=function(){rF();renderPH()};
+renderF();setPret();applyLv();
+/* ===== 清除鈕 ===== */
+document.addEventListener("click",e=>{
+ const b=e.target.closest(".clr");
+ if(b){const pf=b.closest(".pf");let f=null;pf.querySelectorAll(".pg label").forEach(l=>{if(l.classList.contains("bad")||l.classList.contains("warn")){const i=l.querySelector("input");i.value="";l.className="";l.querySelector("small").textContent="";f=f||i}});if(f)f.focus();return}
+ if(e.target.closest("#rx")){const ri=$("ri");ri.value="";ri.readOnly=false;$("rl").className="";ri.nextElementSibling.textContent="";if(Q)Q.done=0;$("rn").textContent="跳過";ri.focus({preventScroll:true})}});
+})();
+/* ===== 搜尋、填空題、對比練習 ===== */
+(function(){
+const esc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),rnd=a=>a[Math.random()*a.length|0],PN=["yo","tú","él/ella","nosotros","vosotros","ellos"],PX=["me","te","se","nos","os","se"];
+const M=document.querySelector("main");
+/* --- 搜尋 --- */
+document.querySelector(".top").insertAdjacentHTML("afterend",'<div class="srx" id="sr" hidden></div>');
+function allT(k){const r=RS.has(k);return Object.keys(TS).filter(t=>!(r&&(t==="imv"||t==="neg"))).map(t=>{let o;try{o=(CJ[t]||conj)(k)}catch(e){return""}
+ return`<tr><td class="l">${TS[t].zh}<br><small>${TS[t].es}</small></td>`+[0,1,2,3,4,5].map(i=>{const x=o.f[i];return x?`<td class="${x!==o.reg[i]?"x":""}">${r&&t!=="ger"?PX[i]+" ":""}${x}</td>`:"<td>—</td>"}).join("")+"</tr>"}).join("")}
+function showV(k){const g=$("sr");g.hidden=false;M.classList.add("srch");g.innerHTML=`<div class="srh"><b class="sp" data-s="${k}">${k}</b><span class="zh">${GL[k]||""}</span><span class="sp" data-s="${k}">🔊</span><button id="srx" aria-label="關閉">×</button></div><div class="scroll"><table class="st"><tr><th></th>${PN.map(p=>`<th>${p}</th>`).join("")}</tr>${allT(k)}</table></div>`}
+const sxn=x=>x.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();let FI2=null;
+function buildFI2(){FI2={};for(const k of Object.keys(GL)){for(const t of Object.keys(TS)){let o;try{o=(CJ[t]||conj)(k)}catch(e){continue}for(const f of(o.f||[])){if(!f)continue;const n=sxn(f);(FI2[n]=FI2[n]||new Set()).add(k);const w=n.split(/\s+/).pop();(FI2[w]=FI2[w]||new Set()).add(k)}}}}
+function found(){const v=$("q").value,q=sxn(v).replace(/\s+/g," "),ks=Object.keys(GL);if(!q)return[];
+ let m=ks.filter(k=>sxn(k)===q);if(!m.length)m=ks.filter(k=>sxn(k).startsWith(q));
+ if(!m.length){if(!FI2)buildFI2();m=[...(FI2[q]||[])]}
+ if(!m.length&&v.trim())m=ks.filter(k=>(GL[k]||"").includes(v.trim()));return m}
+function doS(){const m=found(),g=$("sr");if(!$("q").value.trim()){g.hidden=true;M.classList.remove("srch");return}
+ if(m.length===1)return showV(m[0]);g.hidden=false;M.classList.add("srch");
+ g.innerHTML=m.length?`<div class="chips">${m.slice(0,16).map(k=>`<button data-sv="${k}">${k}</button>`).join("")}</div>`:'<p class="note" style="margin:0">找不到符合的動詞。</p>'}
+$("q").addEventListener("input",doS);
+$("q").addEventListener("keydown",e=>{if(e.key==="Enter"){const m=found();if(m.length)showV(m[0])}});
+/* --- 填空題 --- */
+$("rnd").insertAdjacentHTML("beforeend",`<div class="card" id="cz"><h2>填空題</h2><p class="note" id="czs"></p><p class="zh" id="czz" style="margin:4px 0"></p><p class="es" id="cze" style="font-size:19px;margin:4px 0 10px"></p><div class="pf"><div class="pg one"><label id="czl"><span id="czh"></span><input id="czi" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"><small></small></label></div><div class="acc">${[..."áéíóúñü"].map(c=>`<button type="button" data-c="${c}">${c}</button>`).join("")}</div></div><div class="pb"><button class="chk2" id="czc">檢查</button><button id="czk">解答</button><button id="czx">清除</button><button id="czn">跳過</button></div></div>`);
+(function(){const rn=$("rnd"),w=document.createElement("div");w.className="qc";[...rn.children].forEach(c=>{if(c.id!=="cz"&&c.tagName!=="H2")w.appendChild(c)});rn.insertBefore(w,$("cz"));rn.querySelector("h2").insertAdjacentHTML("afterend",'<div class="row2"><div class="sc" id="lvb">程度<button data-rl="1" class="on">A1</button><button data-rl="2">A2</button><button data-rl="0">全部</button></div><div class="sc" id="qtb">題型<button data-qt="0" class="on">變位</button><button data-qt="1">填空</button></div><div class="sc" id="tsc">時態<button data-mx="0" class="on">當前時態</button><button data-mx="1">混合時態</button></div></div>')})();
+let CZ=null,CZM=0,CS={n:0,ok:0};
+function czNext(){const ts=MIX?Object.keys(TS).filter(t=>TS[t].lv<=(RL===1?1:2)):[TENSE],ks=Object.keys(GL).filter(k=>k!=="haber"&&rokv(k));
+ for(let n=0;n<500;n++){const t=rnd(ts),k=rnd(ks),a=(t==="pres"?E:t==="pret"?EP:(XP[t]||{}))[k];if(!a||(RS.has(k)&&(t==="imv"||t==="neg")))continue;
+  const[es0,zh]=rnd(a).split("|"),es=es0.replace(/^\[[^\]]+\]\s*/,"");let f;try{f=(CJ[t]||conj)(k).f}catch(e){continue}
+  let b=null;f.forEach((x,i)=>{if(!x)return;const m=es.match(new RegExp("(^|[^\\p{L}])("+esc(x)+")(?![\\p{L}])","iu"));if(m&&(!b||x.length>b.x.length))b={x,m}});
+  if(!b)continue;const at=b.m.index+b.m[1].length,ix=f.map((x,i)=>x===b.x?i:-1).filter(i=>i>=0);
+  CZ={a:b.x,es:es.slice(0,at)+"{}"+es.slice(at+b.x.length),done:0,cnt:0};
+  $("cze").textContent=CZ.es.replace("{}","＿＿＿＿");$("czz").textContent=zh;
+  $("czh").textContent=k+" "+(GL[k]||"")+"｜"+TS[t].zh+"｜"+ix.map(i=>PN[i]).join(" / ");
+  const i=$("czi");i.value="";i.readOnly=false;$("czl").className="";i.nextElementSibling.textContent="";$("rs").textContent="";$("czn").textContent="跳過";i.focus({preventScroll:true});return}
+ $("cze").textContent="這個範圍暫時沒有可出題的例句。"}
+function czCheck(){if(!CZ||CZ.done)return;const i=$("czi"),v=norm(i.value),a=CZ.a;let c,t;
+ if(v===norm(a)){c="ok";t="正確"}else if(v&&bare(v)===bare(norm(a))){c="warn";t="注意重音"}else{c="bad";t=""}
+ $("czl").className=c;i.nextElementSibling.innerHTML=t+(c==="ok"?` <span class="sp" data-s="${CZ.es.replace("{}",a)}">🔊</span>`:"");CZ.done=(c==="ok")?1:0;$("czn").textContent=c==="ok"?"下一題":"跳過"}
+function czReveal(){if(!CZ)return;const i=$("czi");if($("czl").className!=="ok")$("czl").className="bad";i.nextElementSibling.innerHTML="正解："+CZ.a+` <span class="sp" data-s="${CZ.es.replace("{}",CZ.a)}">🔊</span>`;CZ.done=1;$("czn").textContent="下一題"}
+/* --- 事件 --- */
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="czi"){e.preventDefault();e.stopImmediatePropagation();CZ&&CZ.done?czNext():czCheck()}},true);
+document.addEventListener("click",e=>{const t=e.target;let b;
+ if(t.closest("#srx")){$("sr").hidden=true;M.classList.remove("srch");return}
+ if(b=t.closest("[data-sv]")){$("q").value=b.dataset.sv;showV(b.dataset.sv);return}
+ if(t.closest("#czk"))return czReveal();if(t.closest("#czc"))return czCheck();if(t.closest("#czn"))return czNext();
+ if(t.closest("#czx")){const i=$("czi");i.value="";i.readOnly=false;$("czl").className="";i.nextElementSibling.textContent="";if(CZ)CZ.done=0;$("czn").textContent="跳過";i.focus({preventScroll:true});return}
+ if(b=t.closest("[data-qt]")){QT=+b.dataset.qt;$("rnd").classList.toggle("qz",!!QT);[...b.parentNode.querySelectorAll("button")].forEach(x=>x.classList.toggle("on",x===b));nextQ();return}
+ if(b=t.closest('a[href="#ph"]'))$("ph").open=true});
+window.czNext=czNext;
+const sP=setPret;setPret=function(){sP.apply(this,arguments);$("nav").insertAdjacentHTML("beforeend",'<a href="#ph">片語</a>')};
+setPret();
+})();
+
+/* ===== 補丁：例句修正、補空白、點擊發音、版面 ===== */
+const RARE={ger:new Set("ser estar saber poder querer deber tener costar parecer oír preferir creer temer necesitar llamarse".split(" ")),imv:new Set("llover costar saber morir parecer oír caer sufrir temer deber romper poder querer sentir tardar necesitar".split(" "))};
+(function(){
+const F={
+ger:{llegar:"Ya estoy llegando a casa.|我快到家了。",olvidar:"Se me está olvidando la contraseña.|我快要忘記密碼了。",cumplir:"Estoy cumpliendo mi promesa.|我正在履行我的承諾。",partir:"El tren está partiendo.|火車正在出發。",levantarse:"Me estoy levantando.|我正在起床。",ducharse:"Me estoy duchando.|我正在淋浴。",acostarse:"Me estoy acostando.|我正要上床睡覺。",sentirse:"Me estoy sintiendo mejor.|我覺得越來越好。",caer:"Las hojas están cayendo.|葉子正在掉落。",mentir:"No estoy mintiendo.|我沒有說謊。",perder:"Estoy perdiendo el tiempo.|我在浪費時間。",tardar:"Estoy tardando mucho.|我花太久了。",casarse:"Mis amigos se están casando hoy.|我的朋友今天結婚。"},
+imv:{llegar:"Llega temprano.|早點到。",encontrar:"Encuentra tus llaves.|找到你的鑰匙。",lograr:"Logra tus metas.|實現你的目標。",soñar:"Sueña en grande.|大膽去夢想。",agradecer:"Agradece su ayuda.|感謝他的幫忙。",trabajar:"Trabaja un poco más.|再多工作一下。",olvidar:"Olvida el problema.|忘了這個問題吧。",perder:"Pierde el miedo.|別再害怕了。",reconocer:"Reconoce tu error.|承認你的錯誤。"},
+perf:{cumplir:"He cumplido veinte años.|我已經滿二十歲了。",deber:"He debido salir antes.|我本來應該早點出門。",saber:"No he sabido qué decir.|我不知道該說什麼。"},
+impf:{comprender:"No comprendía la lección.|我以前聽不懂這一課。",romper:"De niño rompía muchos vasos.|我小時候常打破杯子。",cumplir:"Mi abuelo siempre cumplía sus promesas.|我爺爺以前總是遵守承諾。",entender:"No entendía el inglés.|我以前聽不懂英文。"},
+fut:{ducharse:"Mañana me ducharé temprano.|明天我會早點淋浴。"},
+cond:{olvidar:"Yo no olvidaría su cumpleaños.|我不會忘記他的生日。|建議",sufrir:"Sin ti, sufriría mucho.|沒有你，我會很難過。|假設",llover:"En abril llovería mucho.|四月可能會下很多雨。|假設",morir:"Moriría de risa.|我會笑死。|假設",oír:"Con audífonos oiría mejor.|戴耳機我會聽得更清楚。|假設",caer:"Se caería si no lo sujetas.|你不扶著，它會掉下來。|假設",llamarse:"Se llamaría Lucía si fuera niña.|如果是女孩，她會叫 Lucía。|假設"}};
+Object.keys(F).forEach(t=>{XP[t]=XP[t]||{};Object.keys(F[t]).forEach(k=>{XP[t][k]=[F[t][k]]})});
+XP.fut.ducharse=[F.fut.ducharse];
+delete XP.imv.mentir;
+})();
+addEventListener("scroll",()=>document.body.classList.toggle("sm",scrollY>140&&!document.querySelector('main.rnd')),{passive:true});
+$("bar").addEventListener("click",e=>{const m=e.target.dataset.m;if(m)document.querySelector("main").classList.toggle("prac",m==="practice")});
+document.addEventListener("click",e=>{const t=e.target;let c;
+ if(c=t.closest(".ct td:not(.l),.st td:not(.l)")){const x=c.textContent.trim();if(x&&x!=="—")speak(x);return}
+ if(c=t.closest(".ex .es,#ph .es")){speak((c.querySelector(".sp")||{dataset:{}}).dataset.s||c.firstChild.textContent);return}
+ if(t.closest("#rv")){speak($("rv").textContent);return}
+ if(c=t.closest(".pg label.ok small,.pg label.warn small,.pg label.bad small")){const q=c.querySelector(".sp");if(q)speak(q.dataset.s)}});
+document.addEventListener("click",e=>{const b=e.target.closest("[data-rl]");if(b){RL=+b.dataset.rl;syncRL();const l=RL===1?1:2;if(LV!==l){const x=document.querySelector('#lbar [data-l="'+l+'"]');if(x){x.click();return}}nextQ();return}
+ if(e.target.closest("#bar"))setTimeout(()=>dispatchEvent(new Event("scroll")),60)});
+function rReveal(){if(!Q)return;const ri=$("ri"),c=$("rl");if(c.className!=="ok")c.className="bad";ri.nextElementSibling.innerHTML="正解："+Q.a+` <span class="sp" data-s="${Q.p+Q.a}">🔊</span>`;Q.done=1;$("rn").textContent="下一題"}
+function boldF(p,k){try{const f=(CJ[TENSE]||conj)(k).f;let b=null;f.forEach(x=>{if(!x)return;const m=p.match(new RegExp("(^|[^\\p{L}])("+x.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")(?![\\p{L}])","iu"));if(m&&(!b||x.length>b.x.length))b={x,m}});if(!b)return p;const at=b.m.index+b.m[1].length;return p.slice(0,at)+"<b>"+p.slice(at,at+b.x.length)+"</b>"+p.slice(at+b.x.length)}catch(e){return p}}
+function pairNote(k){if(TENSE!=="imv"&&TENSE!=="neg"||RS.has(k))return"";try{const a=conjIm(k).f,n=CJ.neg(k).f;if(!a[1]||!a[2]||!a[4]||!n[1]||!n[2]||!n[4])return"";return`<p class="cap">肯定 ↔ 否定｜tú：${a[1]} ↔ ${n[1]}｜usted：${a[2]} ↔ ${n[2]}｜vosotros：${a[4]} ↔ ${n[4]}</p>`}catch(e){return""}}
+(function(){const H=`imv|insistir|[tú] Insiste en pagar tú, que él pagó la última vez.|這次你就堅持要付吧，上次是他付的。
+imv|tardar|[tú] Tarda lo que necesites, no hay prisa.|你需要多久就多久，不急。
+imv|tardar|[usted] Perdone, tarde lo que necesite, yo espero.|沒關係，您需要多久都行，我等您。
+imv|romper|[tú] Rompe ese papel y tíralo a la basura.|把那張紙撕掉，丟進垃圾桶。
+imv|romper|[usted] Señora, rompa el sello y abra la caja.|太太，請您撕開封條再打開盒子。
+imv|saber|[tú] Sabe que cuentas conmigo.|要知道，你可以靠我。
+imv|saber|[usted] Sepa que aquí siempre es bienvenido.|請您知道，這裡隨時歡迎您。
+imv|oír|[tú] Oye, ¿tienes un momento?|欸，你有空嗎？
+imv|oír|[usted] Oiga, perdone, ¿sabe dónde está la estación?|不好意思，請問您知道車站在哪嗎？
+imv|oír|[vosotros] Oíd, chicos, ya empieza la película.|喂，各位，電影要開始了。
+imv|querer|[tú] Quiere a tu familia, siempre estará contigo.|好好珍惜你的家人，他們永遠都在。
+imv|sentir|[tú] Siente la música y deja de pensar tanto.|用心感受音樂，別想那麼多。
+imv|levantarse|[tú] Levántate, que ya es tarde.|起床啦，已經很晚了。
+imv|levantarse|[usted] Levántese despacio, por favor.|請您慢慢起身。
+imv|levantarse|[vosotros] Levantaos ya, chicos, que llegamos tarde.|你們快起床，我們要遲到了。
+imv|ducharse|[tú] Dúchate antes de cenar.|吃晚餐前先去洗澡。
+imv|ducharse|[vosotros] Duchaos rápido, que se acaba el agua caliente.|你們洗快一點，熱水快沒了。
+imv|acostarse|[tú] Acuéstate temprano hoy.|今天早點睡。
+imv|acostarse|[vosotros] Acostaos ya, que mañana hay cole.|你們快去睡，明天要上學。
+imv|despertarse|[tú] Despiértate, que llegamos tarde.|醒醒，我們要遲到了。
+imv|despertarse|[vosotros] Despertaos, chicos, el desayuno está listo.|你們起來吧，早餐好了。
+imv|vestirse|[tú] Vístete rápido, que nos vamos.|快點穿衣服，我們要出門了。
+imv|vestirse|[vosotros] Vestíos abrigados, hace frío.|你們穿暖一點，外面很冷。
+imv|sentarse|[tú] Siéntate aquí, tengo que contarte algo.|坐這裡，我有事要跟你說。
+imv|sentarse|[usted] Siéntese, por favor, el doctor ya viene.|請您坐，醫生馬上來。
+imv|sentarse|[vosotros] Sentaos todos, vamos a empezar.|大家坐好，我們要開始了。
+imv|ponerse|[tú] Ponte el abrigo, que hace frío.|穿上外套，外面很冷。
+imv|ponerse|[usted] Póngase cómodo, por favor.|請您自在一點。
+imv|lavarse|[tú] Lávate las manos antes de comer.|吃飯前先洗手。
+imv|lavarse|[vosotros] Lavaos las manos, que ya está la comida.|你們去洗手，飯好了。
+imv|bañarse|[tú] Báñate ya, que se enfría el agua.|快去洗澡，水要涼了。
+imv|peinarse|[tú] Péinate un poco antes de salir.|出門前稍微梳一下頭髮。
+imv|afeitarse|[tú] Aféitate antes de la entrevista.|面試前先把鬍子刮一刮。
+imv|quedarse|[tú] Quédate a cenar con nosotros.|留下來跟我們一起吃晚餐吧。
+imv|quedarse|[usted] Quédese tranquilo, yo me encargo.|您放心，我來處理。
+imv|sentirse|[tú] Siéntete como en casa.|就當自己家，別客氣。
+imv|sentirse|[usted] Siéntase como en su casa.|請您就當自己家，別客氣。
+imv|divertirse|[tú] Diviértete mucho en la fiesta.|派對玩得開心點。
+imv|divertirse|[vosotros] Divertíos, chicos, y volved temprano.|你們好好玩，早點回來。
+imv|casarse|[tú] Cásate conmigo.|跟我結婚吧。
+imv|preocuparse|[tú] Preocúpate más por tu salud y menos por el trabajo.|多關心自己的健康，少操心工作。
+imv|quejarse|[tú] Quéjate al jefe, no a mí.|有意見去跟老闆說，別跟我抱怨。
+imv|acordarse|[tú] Acuérdate de llamar a tu abuela.|記得打電話給你奶奶。
+imv|acordarse|[usted] Acuérdese de traer el pasaporte.|請您記得帶護照。
+neg|insistir|[tú] No insistas en pagar, hoy invito yo.|別堅持要付了，今天我請客。
+neg|insistir|[usted] Señor López, no insista en pagar, es cortesía de la casa.|李先生，您別堅持要付了，這是店裡招待的。
+neg|trabajar|[tú] No trabajes tanto, descansa un poco.|別工作太拚，休息一下。
+neg|trabajar|[usted] Jefe, no trabaje hasta tan tarde, se va a cansar.|老闆，您別工作到那麼晚，會累壞的。
+neg|estudiar|[tú] No estudies hasta tan tarde.|別念書念到那麼晚。
+neg|estudiar|[vosotros] No estudiéis con la tele puesta.|你們別開著電視念書。
+neg|bailar|[tú] No bailes descalzo, el suelo está sucio.|別打赤腳跳舞，地板很髒。
+neg|cantar|[tú] No cantes tan alto, el bebé está durmiendo.|別唱那麼大聲，寶寶在睡覺。
+neg|pasar|[tú] No pases por esa calle, está cortada.|別走那條路，封路了。
+neg|pasar|[usted] Perdone, no pase por aquí, hay obras.|不好意思，請您別從這裡過，在施工。
+neg|tardar|[tú] No tardes mucho, te esperamos.|別太久喔，我們等你。
+neg|creer|[tú] No me creas, pregúntaselo a él.|別信我，你自己去問他。
+neg|romper|[tú] No rompas el papel, quiero guardarlo.|別把包裝紙撕破，我想留著。
+neg|pensar|[tú] No pienses tanto y decide ya.|別想太多，快決定吧。
+neg|entender|[tú] No me entiendas mal, solo quiero ayudar.|別誤會我，我只是想幫忙。
+neg|sentir|[tú] No sientas vergüenza, a todos nos pasa.|別覺得丟臉，大家都會這樣。
+neg|dormir|[tú] No duermas con el móvil en la cama.|別抱著手機睡覺。
+neg|dormir|[vosotros] No durmáis tan tarde.|你們別睡太晚。
+neg|seguir|[tú] No sigas por esa calle, gira a la derecha.|別繼續走那條路，右轉。
+neg|seguir|[usted] No siga recto, gire a la izquierda.|請您不要直走，左轉。
+neg|levantarse|[tú] No te levantes, ya lo recojo yo.|你別起來，我來收就好。
+neg|levantarse|[usted] No se levante, por favor.|請您不用起來。
+neg|acostarse|[tú] No te acuestes tan tarde.|別太晚睡。
+neg|despertarse|[tú] No te despiertes todavía, es temprano.|還早，再睡一下吧。
+neg|sentarse|[tú] No te sientes ahí, la silla está rota.|別坐那裡，椅子壞了。
+neg|sentarse|[usted] No se siente aquí, está reservado.|請您別坐這裡，這個位子有人訂了。
+neg|ponerse|[tú] No te pongas nervioso, todo saldrá bien.|別緊張，一切都會順利的。
+neg|quedarse|[tú] No te quedes ahí parado, ayúdame.|別杵在那裡，過來幫我。
+neg|quedarse|[vosotros] No os quedéis fuera, entrad.|你們別站在外面，進來吧。
+neg|sentirse|[tú] No te sientas mal, no fue tu culpa.|別難過，不是你的錯。
+neg|casarse|[tú] No te cases solo por dinero.|別只為了錢結婚。
+neg|preocuparse|[tú] No te preocupes, yo me encargo.|別擔心，我來處理。
+neg|preocuparse|[usted] No se preocupe, ya lo arreglo.|您別擔心，我馬上處理。
+neg|quejarse|[tú] No te quejes tanto, ya casi terminamos.|別一直抱怨，快做完了。
+neg|aburrirse|[tú] No te aburras, saca un libro.|別無聊，拿本書出來看。
+neg|enfadarse|[tú] No te enfades, solo era una broma.|別生氣，只是開玩笑。
+ger|sentir|Estoy sintiendo un dolor raro en la espalda.|我背後一直有種怪怪的痛。
+ger|tener|Estoy teniendo problemas con el wifi.|我的 Wi-Fi 一直出問題。
+ger|ser|Estás siendo muy amable conmigo.|你對我真的很貼心。
+ger|oír|Estoy oyendo un ruido raro en la cocina.|我聽到廚房有奇怪的聲音。
+ger|costar|Está costando mucho encontrar casa en el centro.|市中心要找房子真的很難。
+neg|quedar|No quedes con él esta noche.|今晚別跟他約。
+neg|practicar|No practiques con el volumen tan alto.|練習時別開那麼大聲。
+neg|comentar|No comentes nada con nadie todavía.|先別跟任何人說這件事。
+neg|cuidar|No cuides solo a los demás; cuídate también.|別只顧著照顧別人，也要照顧自己。
+neg|descansar|No descanses todavía, falta un poco.|先別休息，還差一點點。
+neg|disfrutar|No disfrutes del postre antes de la cena.|晚餐前別先吃甜點。
+neg|perdonar|No perdones tan rápido si te mienten.|如果有人騙你，別那麼快原諒。
+neg|tratar|No trates de arreglarlo tú solo.|別想自己一個人修好它。
+neg|imaginar|No imagines cosas que no han pasado.|別去想像還沒發生的事。
+neg|ahorrar|No ahorres en la seguridad.|安全方面別省。
+neg|mejorar|No mejores lo que ya funciona bien.|已經很好用的就別再改了。
+neg|aprender|No aprendas de memoria; intenta entender.|別死背，試著去理解。
+neg|comprender|No me comprendas mal.|別誤會我。
+neg|temer|No temas, estoy aquí contigo.|別怕，我在這裡陪你。
+neg|vivir|No vivas con tanta prisa.|別活得那麼匆忙。
+neg|partir|No partas sin despedirte.|走之前要好好道別。
+neg|cumplir|No cumplas todo lo que te piden.|別人要你做什麼，你別都照做。
+neg|sufrir|No sufras por tonterías.|別為小事煩惱。
+neg|querer|No quieras tenerlo todo.|別想什麼都要。
+neg|encontrar|No encuentres excusas para no ir.|別找藉口不去。
+neg|recordar|No recuerdes lo malo; mira hacia delante.|別記著不好的事，往前看。
+neg|servir|No sirvas la sopa tan caliente.|湯別盛得太燙。
+neg|soñar|No sueñes tanto y ponte a trabajar.|別光做夢了，開始工作吧。
+neg|defender|No defiendas lo que no sabes.|你不懂的事就別替它辯護。
+neg|oír|No oigas a los que solo critican.|別去聽那些只會批評的人。
+neg|parecer|No parezcas tan serio.|別看起來那麼嚴肅。
+neg|caer|No caigas en la trampa.|別上當。
+neg|reconocer|No reconozcas nada sin hablar con un abogado.|沒跟律師談之前，什麼都別承認。
+neg|agradecer|No agradezcas tanto, es lo normal.|不用一直道謝，這是應該的。
+neg|ducharse|No te duches con agua tan caliente.|別用那麼燙的水洗澡。
+neg|vestirse|No te vistas así para la entrevista.|別穿這樣去面試。
+neg|lavarse|No te laves el pelo todos los días.|別每天洗頭。
+neg|bañarse|No te bañes en el río, es peligroso.|別在河裡游泳，很危險。
+neg|peinarse|No te peines ahora, vamos tarde.|現在別梳頭了，我們要遲到了。
+neg|afeitarse|No te afeites con prisa; te cortarás.|別急著刮鬍子，會割傷。
+neg|divertirse|No te diviertas a costa de los demás.|別拿別人尋開心。
+neg|acordarse|No te acuerdes de las cosas malas.|別去想那些不好的事。
+neg|estar|No estés triste, todo va a salir bien.|別難過，一切都會好起來的。
+imv|parecer|Parece tranquilo, aunque estés nervioso.|就算緊張，也要看起來從容。
+imv|enfadarse|Enfádate si quieres, pero escúchame primero.|你要生氣就生氣，但先聽我說。
+ger|necesitar|Estoy necesitando un poco más de tiempo.|我現在需要多一點時間。
+ger|temer|Me estoy temiendo lo peor.|我開始擔心最糟的情況了。
+perf|llamarse|Siempre me he llamado Ana, pero uso mi segundo nombre.|我一直叫 Ana，不過我用我的第二個名字。
+fut|llamarse|Mi hija se llamará Lucía.|我女兒會叫 Lucía。`,seen={};XP.imv=XP.imv||{};XP.neg=XP.neg||{};XP.ger=XP.ger||{};XP.perf=XP.perf||{};XP.fut=XP.fut||{};
+H.split("\n").forEach(l=>{const[t,k,es,zh]=l.split("|"),key=t+k;if(!seen[key]){seen[key]=1;XP[t][k]=[]}XP[t][k].push(es+"|"+zh)});
+RARE.imv.add("mentir");RARE.imv.add("llamarse");RARE.perf=new Set(["llamarse"]);RARE.fut=new Set(["llamarse"]);
+RARE.neg=new Set(Object.keys(GL).filter(k=>!(XP.neg[k]&&XP.neg[k].length)));RARE.imv.add("aburrirse");RARE.imv.add("enfadarse");
+const rk=k=>{try{const e=bs(k).slice(-2).replace("í","i");return e==="ar"?0:e==="er"?1:2}catch(_){return 3}},M2=document.querySelector("main");
+function sortAll(){document.querySelectorAll("#groups .grid,#groupsP .grid,#groupsX .grid").forEach(g=>{const v=[...g.children].filter(c=>c.classList&&c.classList.contains("v")),o=v.map((c,i)=>[c,i]).sort((a,b)=>rk(a[0].dataset.k)-rk(b[0].dataset.k)||a[1]-b[1]).map(x=>x[0]);if(o.some((c,i)=>c!==v[i]))o.forEach(c=>g.appendChild(c))})}
+const ob=new MutationObserver(()=>{ob.disconnect();sortAll();ob.observe(M2,{childList:true,subtree:true})});sortAll();ob.observe(M2,{childList:true,subtree:true});
+})();
+
+/* 修正 freír 虛擬式 nosotros / vosotros 拼寫（無重音符號）*/
+["imv","neg"].forEach(t=>{const f0=CJ[t];if(!f0)return;CJ[t]=k=>{const o=f0(k);if(bs(k)==="freír")o.f=o.f.map(x=>x.replace(/\bfríamos\b/,"friamos").replace(/\bfríáis\b/,"friais"));return o}});
+
+/* ===== 整理與升級 ===== */
+const LB=["請求","建議","假設","轉述"];
+/* 單一詞義但有多個例句的動詞：依用法拆分標籤 */
+const LABS={poder:{pres:["能力","許可"],pret:["做得到","做不到"]},hacer:{pres:["做","天氣"],pret:["做","天氣"]},dar:{pres:["給","搭配"],pret:["給","搭配"]},venir:{pres:["來","來自"],pret:["來","來自"]},tener:{pres:["有","年齡","必須"],pret:["有","必須"]},parecer:{pres:["看起來","覺得"],pret:["看起來","覺得"]},ser:{pres:["身分","來自","特質","時間"],pret:["身分","事件","評價","人物"]},ir:{pres:["去","打算"],pret:["去","去做某事"]}};
+const NOFORM={ger:new Set(["deber","estar"]),imv:new Set(["deber","poder","costar","llover"]),neg:new Set(["deber","poder","costar","llover"])};
+function mm(k,t){return LABS[k]&&LABS[k][t]?LABS[k][t]:(GL[k]||"").split("；")}
+function noEx(k,t){const nf=NOFORM[t]&&NOFORM[t].has(k);return`<p class="zh" style="color:var(--mute)">${nf?"不具備此形態":"此時態較少使用，暫不提供例句。"}</p>`}
+function condLab(es){if(/^¿|^(Querría|Quisiera|Me gustaría|Te importaría)/.test(es))return"請求";
+ if(/En tu lugar|^Yo,? |Deberías|Te recomendaría|Sería mejor|Tendrías que|Debería/.test(es))return"建議";
+ if(/\b[Ss]i\b/.test(es))return"假設";if(/[Dd]ijo que|[Dd]ice que|[Pp]reguntó/.test(es))return"轉述";return"假設"}
+(function(){
+ /* 肯定、否定命令式：移除 tú／usted／vosotros 前綴 */
+ ["imv","neg"].forEach(t=>{const S=XP[t]||{};Object.keys(S).forEach(k=>{S[k]=S[k].map(x=>x.replace(/^\[(tú|usted|vosotros)\]\s*/,""))})});
+ /* 條件式：每句都有用途標籤（第三欄＝詞義索引時，標籤放第四欄） */
+ const C=XP.cond||{};Object.keys(C).forEach(k=>{C[k]=C[k].map(x=>{const p=x.split("|"),es=p[0].replace(/^\[[^\]]+\]\s*/,""),lab=LB.includes(p[2])?p[2]:LB.includes(p[3])?p[3]:condLab(es),mi=/^\d+$/.test(p[2]||"")?p[2]:null;return p[0]+"|"+p[1]+"|"+(mi!==null?mi+"|"+lab:lab)})});
+ /* 單一詞義、多例句：補上詞義索引 */
+ Object.keys(LABS).forEach(k=>Object.keys(LABS[k]).forEach(t=>{const S=t==="pres"?E:EP,a=S[k]||[],n=LABS[k][t].length;if(a.length===n)S[k]=a.map((x,i)=>x.split("|").slice(0,2).join("|")+"|"+i)}));
+ /* 空白格分類：不具備此形態／此時態較少使用 */
+ const has=(t,k)=>{const S=t==="pres"?E:t==="pret"?EP:(XP[t]||{});return(S[k]||[]).length>0};
+ ["ger","imv","perf","fut","neg","cond"].forEach(t=>{RARE[t]=new Set(Object.keys(GL).filter(k=>k!=="haber"&&!has(t,k)&&!(NOFORM[t]&&NOFORM[t].has(k))))});
+})();
+/* ===== 小卡：原形發音、時態頁籤、左右滑動 ===== */
+function exBody(k,t,gus){const T0=TENSE;TENSE=t;try{
+ const S=t==="pres"?E:t==="pret"?EP:(XP[t]||{}),MM=mm(k,t),xs=S[k]||[];
+ const sen=xs.length?xs.map(x=>{const[p,q,m,m4]=x.split("|"),lab=LB.includes(m)?m:LB.includes(m4)?m4:"",mi=/^\d+$/.test(m||"")?+m:null;
+  return`<p>${mi!==null&&MM.length>1?`<em>${MM[mi]}</em>`:""}<span class="ln">${lab?`<b class="who">${lab}</b>`:""}<span class="es">${boldF(p,k)}<span class="sp" data-s="${p}">🔊</span></span></span><span class="zh">${q}</span></p>`}).join(""):noEx(k,t);
+ return gus?sen:MODE==="practice"?pform(k):ctab(k)+sen+pairNote(k)}finally{TENSE=T0}}
+function xHead(k,ts,cur){return`<div class="xt">${ts.map(t=>`<button type="button" class="${t===cur?"on":""}" data-xt="${t}">${TS[t].zh}</button>`).join("")}</div>`}
+function openCard(c,k){const gus=!!c.closest("#gus"),b=document.createElement("div");b.className="ex";b.dataset.k=k;
+ if(gus)b.innerHTML=exBody(k,TENSE,true);
+ else{const ts=Object.keys(TS).filter(t=>TS[t].lv<=LV),cur=ts.includes(TENSE)?TENSE:ts[0];b.dataset.t=cur;b.innerHTML=xHead(k,ts,cur)+'<div class="xb">'+exBody(k,cur,false)+"</div>"}
+ c.appendChild(b);c.classList.add("open");
+ if(MODE==="practice"&&!gus){const f=b.querySelector("input:not(:disabled)");if(f)f.focus({preventScroll:true})}}
+function xtSwitch(ex,t){if(!ex||!TS[t])return;ex.dataset.t=t;
+ ex.querySelectorAll(".xt button").forEach(x=>{const on=x.dataset.xt===t;x.classList.toggle("on",on);if(on)x.scrollIntoView({inline:"center",block:"nearest"})});
+ ex.querySelector(".xb").innerHTML=exBody(ex.dataset.k,t,false);
+ if(MODE==="practice"){const f=ex.querySelector("input:not(:disabled)");if(f)f.focus({preventScroll:true})}}
+(function(){let x0=0,y0=0,go=false;
+ document.addEventListener("touchstart",e=>{const t=e.target,ex=t.closest&&t.closest(".ex .xb");go=false;if(!ex||t.closest("input,textarea"))return;const sc=t.closest(".scroll");if(sc&&sc.scrollWidth>sc.clientWidth+2)return;const p=e.touches[0];x0=p.clientX;y0=p.clientY;go=true},{passive:true});
+ document.addEventListener("touchend",e=>{if(!go)return;go=false;const p=e.changedTouches[0],dx=p.clientX-x0,dy=p.clientY-y0;if(Math.abs(dx)<60||Math.abs(dy)>45)return;
+  const ex=e.target.closest(".ex");if(!ex)return;const bs=[...ex.querySelectorAll(".xt button")],i=bs.findIndex(b=>b.classList.contains("on")),j=i+(dx<0?1:-1);if(bs[j])xtSwitch(ex,bs[j].dataset.xt)},{passive:true})})();
+/* ===== 等級記憶（跨頁面）：選 A2 預設 A1+A2 ===== */
+(function(){const K1="dele_level",K2="dele_f2",get=k=>{try{return localStorage.getItem(k)}catch(e){return null}},set=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+ if(+get(K1)===2){const b=$("lbar").querySelector('[data-l="2"]');if(b)b.click();const f=get(K2);if(f==="0"||f==="1"){F2=+f;applyLv()}}
+ const sv=()=>{set(K1,LV);set(K2,F2)};$("lbar").addEventListener("click",()=>setTimeout(sv));$("fbar").addEventListener("click",()=>setTimeout(sv));sv();
+ const hd=document.querySelector(".hd");addEventListener("scroll",()=>hd.classList.toggle("stuck",scrollY>24),{passive:true})})();
+
+function spk(p){return p.replace(/[\u3400-\u9fff（）()、，＋]+/g," ").replace(/\+/g," ").replace(/\s+/g," ").trim()}
+
